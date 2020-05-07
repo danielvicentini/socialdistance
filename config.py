@@ -11,7 +11,7 @@ botmail="infobot@sparkbot.io"
 webhook_url=os.environ['WEBHOOK_URL']
 # exemplo webhook_url="https://mywebhook.com"
 # webhook_name e' o nome do gatilho que o Webex Teams gera para seu aplicativo entender
-webhook_name="distancebot"
+webhook_name="distancebot-heroku"
 # exemplo webhook_name="meuprimeirochatbot"
 
 # Novidade 27.4.20
