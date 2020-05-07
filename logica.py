@@ -19,7 +19,7 @@ novas_opcoes={
 	}, {
 		"tag": "configurar distanc sala",
 		"title": "Configurar distanciamento na Sala",
-        "desc":"Esta opção vai definir a regra de distanciamento de pessoas numa sala.\nO número que vc informar para um determinada sala\nserá o critério aplicado.",
+        "desc":"Esta opção vai definir a regra de distanciamento de pessoas numa sala.  \nO número que vc informar para um determinada sala  \nserá o critério aplicado.",
 		"option": 12,
 		"req": True,
 		"params": "Nome da Sala, No. de pessoas por sala"
@@ -43,14 +43,14 @@ def opcoes_para_user():
     
     # acessa cada uma das opcoes da configuracao de opcoes
     # para apresentar a lista de comandos disposniveis ao user
-    msg="Comandos disponiveis que posso fazer:\n---\n"
+    msg="Comandos disponiveis que posso fazer:  \n---  \n"
     c=0
     for b in novas_opcoes['opcoes']:
-        msg=msg+"***"+str(c+1)+") "+novas_opcoes['opcoes'][c]['title']+"***\n"
-        msg=msg+novas_opcoes['opcoes'][c]['desc']+"\n"
+        msg=msg+"***"+str(c+1)+") "+novas_opcoes['opcoes'][c]['title']+"***  \n"
+        msg=msg+novas_opcoes['opcoes'][c]['desc']+"  \n"
         c+=1
     
-    msg=msg+"\nDigitel partes do comando para começarmos nossa conversa.\n"
+    msg=msg+"  \nDigitel partes do comando para começarmos nossa conversa.  \n"
 
     return msg
 
@@ -219,14 +219,14 @@ def logica(comando,usermail):
                 memoria[usermail]['option']=opescolhido
                 memoria[usermail]['wait']=True
                 memoria[usermail]['req']=optparam(opescolhido,"req")
-                msg="Você quiz dizer: "+str(optparam(opescolhido,"title"))+" ?\n"
+                msg="Você quiz dizer: "+str(optparam(opescolhido,"title"))+" ?  \n"
 
                 # Se chegou até aqui... na próxima interação robo fica a espera da continuidade da conversa
  
         # 2c nada conhecido, então devolve msg padrão
 
         if msg=="":
-            msg="Olá. Digite ***ajuda*** para ver as opçoes disponíveis.\nVou tentar adivinhar também o que você está procurando :-) \n"
+            msg="Olá. Digite ***ajuda*** para ver as opçoes disponíveis.  \nVou tentar adivinhar também o que você está procurando :-)  \n"
 
     # 3) Aguardando
     # Caso conversa já iniciado, usa este bloco
@@ -238,12 +238,12 @@ def logica(comando,usermail):
         if memoria[usermail]['req']==False:
 
             # mensgem padrão caso não se identifique o que se espera nas próximas condições
-            msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.\n"
+            msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
             msg=msg+"Se é isto digite ***sim***. Na dúvida digite ***não*** e dai vc pode ver o que fazer digitando ***ajuda***."
 
             if "sim" in comando:
             # se chegou aqui no Sim, vai executar se achar funcões para o código desejado
-                msg="vou executar o que você me pediu:\n"
+                msg="vou executar o que você me pediu:  \n"
                 
                 # executa comandos que não precisa de parametros
                 # resgata o código
@@ -251,21 +251,21 @@ def logica(comando,usermail):
 
                 if codigo==51:
                     c=0
-                    saida = "\nSegue o inventário:\n"
+                    saida = "  \nSegue o inventário:  \n"
                     for dado in configuracao['inventario']:
-                        sala="Sala:***"+str(dado['sala'])+"***\n"
-                        ap="Access-Point:"+str(dado['access-point'])+"\n"
-                        dist="Distancia:"+str(dado['distancia'])+"\n"
-                        saida=saida+"---\n"+sala+ap+dist+"---\n"
+                        sala="Sala:***"+str(dado['sala'])+"***  \n"
+                        ap="Access-Point:"+str(dado['access-point'])+"  \n"
+                        dist="Distancia:"+str(dado['distancia'])+"  \n"
+                        saida=saida+"---  \n"+sala+ap+dist+"---  \n"
                         c+=1
                     msg=msg+saida
 
                 elif codigo==31:
-                    msg=msg+"\nO histórico é o seguinte:\n"
-                    msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.\n"
-                    msg=msg+"Sala ***Reunião****: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.\n"
+                    msg=msg+"  \nO histórico é o seguinte:  \n"
+                    msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
+                    msg=msg+"Sala ***Reunião****: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
 
-                msg=msg+"\nEspero ter atendido sua expectativa.\n"
+                msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
                 # uma vez que serviço entrega, zera a memória da conversa
                 reinicia_user(usermail)    
             
@@ -273,16 +273,16 @@ def logica(comando,usermail):
         # vai este caminho se o comando identificado precisa de parametros
         # o robo aguarda os parametros para dali executar as funcoes
         elif memoria[usermail]['req']==True:
-            msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.\n"
-            msg=msg+"Estou aguardando parametros do seu lado. \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")
-            msg=msg+"***\nDigite os parametros separados por virgulas.\nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
+            msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
+            msg=msg+"Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")
+            msg=msg+"***  \nDigite os parametros separados por virgulas.  \nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
 
 
         # 4)  se usuário cancelou a conversa  então este bloco recomeça
 
         # Reinicia conversa se usuario pedir
         if 'reinicie' in comando or "não" in comando or "nao" in comando:
-            msg = "Ok, vou reiniciar nossa conversa.\nDigite ***ajuda*** se quiser saber mais o que posso fazer."
+            msg = "Ok, vou reiniciar nossa conversa.  \nDigite ***ajuda*** se quiser saber mais o que posso fazer."
             reinicia_user(usermail)
 
     # comandos de teste
@@ -293,8 +293,8 @@ def logica(comando,usermail):
         #caso falhe, sinal de que nao ha memoria
         try:
             msg="cógigo:"+str(memoria[usermail]['option'])
-            msg=msg+"\naguardando:"+str(memoria[usermail]['wait'])
-            msg=msg+"\nparametros:"+str(memoria[usermail]['req'])
+            msg=msg+"  \naguardando:"+str(memoria[usermail]['wait'])
+            msg=msg+"  \nparametros:"+str(memoria[usermail]['req'])
 
         except:
             msg="Erro no resgate da memoria"    
