@@ -16,7 +16,7 @@ novas_opcoes={
         "desc":"Esta opção vai aplicar as configurações que vc alterou.",
 		"option": 11,
 		"req": True,
-		"params": "executar"
+		"params": "salvar"
 	}, {
 		"tag": "configurar distanc sala",
 		"title": "Configurar distanciamento na Sala",
@@ -342,12 +342,12 @@ def logica(comando,usermail):
                         texto=""
                         c=0
                         while c<len(parametros_digitados):
-                            texto=texto+parametros_esperados[c]+":"+parametros_digitados[c]+" "
+                            texto=texto+parametros_esperados[c]+"="+parametros_digitados[c]+" "
                             c+=1
                         # Se chegou até aqui, avisa agora que falta só o sim
                         msg=msg_titulo
                         msg=msg+"Parametros digitados: "+texto
-                        msg=msg+"  \nConfirma? Diga ***sim*** ou ***ok***  \n"
+                        msg=msg+"  \nConfirma? Diga ***sim*** ou ***ok*** para executar. Digite ***não*** ou ***reinicie*** para recomeçar.  \n"
                         memoria[usermail]['params']=True
                     else:
                         # informa que ainda falta qtde de parametros
