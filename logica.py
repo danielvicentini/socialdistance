@@ -2,12 +2,13 @@
 from webexteams import getwebexMsg, webexmsgRoomviaID
 import json
 
-# ver 1.4 - 6.5.20
+# ver 1.4 - 7.5.20
 
 # opcoes de comandos
 #versao nova
 
-# Como devem ser as opcoes difinitivas
+# opçoes
+# roadmap: 1) Arquivo JSON, 2) GET num site http
 novas_opcoes={
 	"opcoes": [{
 		"tag": "configura aplica",
@@ -15,7 +16,7 @@ novas_opcoes={
         "desc":"Esta opção vai aplicar as configurações que vc alterou.",
 		"option": 11,
 		"req": True,
-		"params": "sim ou não"
+		"params": "executar"
 	}, {
 		"tag": "configurar distanc sala",
 		"title": "Configurar distanciamento na Sala",
@@ -43,7 +44,7 @@ def opcoes_para_user():
     
     # acessa cada uma das opcoes da configuracao de opcoes
     # para apresentar a lista de comandos disposniveis ao user
-    msg="Comandos disponiveis que posso fazer:  \n---  \n"
+    msg="***Comandos disponiveis que posso fazer***:  \n\n"
     c=0
     for b in novas_opcoes['opcoes']:
         msg=msg+"***"+str(c+1)+") "+novas_opcoes['opcoes'][c]['title']+"***  \n"
@@ -126,7 +127,7 @@ def reinicia_user(usermail):
     # reinicia variavies da memoria par ao usuario
     # robo vai comecar do zero com este usuario
     try:
-        var={ 'wait':False, 'option':0, 'req':False}
+        var={ 'wait':False, 'option':0, 'req':False, 'params':False, 'typed':'','typing':False}
         memoria[usermail]=var
         aguardando=memoria[usermail]['wait']
         #print ('criado variáveis para user')
@@ -135,7 +136,6 @@ def reinicia_user(usermail):
 
 
 def logica(comando,usermail):
-
    
     global aguardando
     global memoria
@@ -185,8 +185,6 @@ def logica(comando,usermail):
         # se chegamos aqui, usuario esta se comunicando pela primeira vez,
         # protanto variaveis serao criadas
         reinicia_user(usermail)
-        #var={ 'wait':False, 'option':0, 'req':False}
-        #memoria[usermail]=var
         aguardando=memoria[usermail]['wait']
         #print ('criado variáveis para user')
     
@@ -209,7 +207,7 @@ def logica(comando,usermail):
                 
         #2b. tenta adivinhar o comando consultando os comandos disponiveis
 
-        # apos isto o robo entra em modo de espera
+        # caso ele encontre uma opcao, apresenta e apos isto o robo entra em modo de espera
 
         if msg=="" and len(sp)>0 and len(comando)>=5:
             # chama função que devolve o cod da opcao mais aproximada
@@ -230,6 +228,8 @@ def logica(comando,usermail):
 
     # 3) Aguardando
     # Caso conversa já iniciado, usa este bloco
+    # Aqui varios ramos da conversa existe
+    # 1o Aguardo o comando
 
     if aguardando==True:
   
@@ -237,7 +237,7 @@ def logica(comando,usermail):
         # basicamente o robo aguarda um sim ou nao
         if memoria[usermail]['req']==False:
 
-            # mensgem padrão caso não se identifique o que se espera nas próximas condições
+            # mensagem padrão caso não se identifique o que se espera nas próximas condições
             msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
             msg=msg+"Se é isto digite ***sim***. Na dúvida digite ***não*** e dai vc pode ver o que fazer digitando ***ajuda***."
 
@@ -250,32 +250,119 @@ def logica(comando,usermail):
                 codigo=memoria[usermail]['option']
 
                 if codigo==51:
+                    # funcao inventario
                     c=0
                     saida = "  \nSegue o inventário:  \n"
                     for dado in configuracao['inventario']:
-                        sala="Sala:***"+str(dado['sala'])+"***  \n"
+                        sala="Sala:**"+str(dado['sala'])+"**  \n"
                         ap="Access-Point:"+str(dado['access-point'])+"  \n"
                         dist="Distancia:"+str(dado['distancia'])+"  \n"
-                        saida=saida+"---  \n"+sala+ap+dist+"---  \n"
+                        saida=saida+"___  \n"+sala+ap+dist+"___  \n"
                         c+=1
                     msg=msg+saida
 
                 elif codigo==31:
+                    # funcao historico
                     msg=msg+"  \nO histórico é o seguinte:  \n"
                     msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
-                    msg=msg+"Sala ***Reunião****: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
+                    msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
 
                 msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
-                # uma vez que serviço entrega, zera a memória da conversa
+                # uma vez que serviço entregue, zera a memória da conversa
                 reinicia_user(usermail)    
             
         
-        # vai este caminho se o comando identificado precisa de parametros
+        # vai neste caminho se o comando identificado precisa de parametros
         # o robo aguarda os parametros para dali executar as funcoes
+
+
+        # Começa aqui se robo está aguardando parametros
         elif memoria[usermail]['req']==True:
-            msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
-            msg=msg+"Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")
-            msg=msg+"***  \nDigite os parametros separados por virgulas.  \nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
+            
+            # mensgem padrão caso não se identifique o que se espera nas próximas condições
+            msg_titulo="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
+            msg_param="Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")+"***  \n"
+            msg=msg_titulo+msg_param+"***Digite os parametros separados por virgulas.  \nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
+
+            # trata aqui se parametros estão ok
+
+            # Se chegou aqui é por que parametros estão prontos
+            if memoria[usermail]['params']==True:
+
+                # resgata o que foi digitado como parametros
+                parametros=memoria[usermail]['typed']
+
+                if "sim" in comando or 'ok' in comando:
+                # se chegou aqui no Sim, vai executar se achar funcões para o código desejado
+                    msg="Vou executar o que você me pediu:  \n"
+                    
+                    # executa comandos que não precisa de parametros
+                    # resgata o código
+                    codigo=memoria[usermail]['option']
+                    
+                    if codigo==11:
+                        # funcao inventario
+                        msg=msg+"Executando a aplicacão da config..."
+                                                
+                    if codigo==12:
+                        # funcao inventario
+                        msg=msg+"Executando a config da distancia..."
+
+                       
+                    msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
+                    # uma vez que serviço entregue, zera a memória da conversa
+                    reinicia_user(usermail) 
+
+                else:
+                    # caso ainda não tenha digitado o sim, então pede o prox passo:
+                    msg=msg_titulo+"Voce digitou os parâmetros ("+parametros+") e estou pronto para executar com estes parametros  \n"
+                    msg=msg+"Diga ***sim*** ou ***ok*** que eu executo ou digite ***não*** ou ***reinicie*** para recomeçarmos.  \n"   
+        
+            
+            elif memoria[usermail]['params']==False:
+            # se chegou aqui, aguarda parametros, mas ainda não estão prontos
+
+            
+                if memoria[usermail]['typing']==True:
+                    # fica neste modo a espera dos parametros
+                    # quando qtde de comandos está ok, define que qtde de parametros esta correta
+                                        
+                    #copia ultimo comando para memoria
+                    memoria[usermail]['typed']=comando
+                    parametros=memoria[usermail]['typed']
+                    
+                    # testa se qtde de comandos está ok
+                    # lista de comandos que se espera
+                    parametros_esperados=(optparam(memoria[usermail]['option'],"params").split(","))
+                    # lista de comandos digitadaos
+                    parametros_digitados=(parametros.split(","))
+                    
+                    # testa se qtde de comandos está ok
+                    if len(parametros_esperados) == len(parametros_digitados):
+                        texto=""
+                        c=0
+                        while c<len(parametros_digitados):
+                            texto=texto+parametros_esperados[c]+":"+parametros_digitados[c]+" "
+                            c+=1
+                        # Se chegou até aqui, avisa agora que falta só o sim
+                        msg=msg_titulo
+                        msg=msg+"Parametros digitados: "+texto
+                        msg=msg+"  \nConfirma? Diga ***sim*** ou ***ok***  \n"
+                        memoria[usermail]['params']=True
+                    else:
+                        # informa que ainda falta qtde de parametros
+                        msg="Falta parâmetros para o comando. Tente de novo.  \n"
+                        msg=msg+msg_param
+
+
+               # se chegou aqui, aguarda user dizer se é o comando inicialmente está correto ou não
+                if memoria[usermail]['typing']==False:
+                    if 'sim' in comando:
+                        msg= "Ok. Digite os parametros para completar o comando:"+(optparam(memoria[usermail]['option'],"params"))
+                        msg= msg+"  \nLembre-se de separar os comandos por vírgulas.  \n"
+                        memoria[usermail]['typing']=True
+                        # sendo sim, significa agora que está a espera de parametros
+                        
 
 
         # 4)  se usuário cancelou a conversa  então este bloco recomeça
@@ -293,9 +380,11 @@ def logica(comando,usermail):
         #caso falhe, sinal de que nao ha memoria
         try:
             msg="cógigo:"+str(memoria[usermail]['option'])
-            msg=msg+"  \naguardando:"+str(memoria[usermail]['wait'])
-            msg=msg+"  \nparametros:"+str(memoria[usermail]['req'])
-
+            msg=msg+"  \nwait:"+str(memoria[usermail]['wait'])
+            msg=msg+"  \nrequer parametros:"+str(memoria[usermail]['req'])
+            msg=msg+"  \nparametros:"+str(memoria[usermail]['params'])
+            msg=msg+"  \ndigitando parametros:"+str(memoria[usermail]['typing'])
+            msg=msg+"  \no que foi digitado:"+str(memoria[usermail]['typed'])
         except:
             msg="Erro no resgate da memoria"    
 
@@ -307,17 +396,18 @@ def logica(comando,usermail):
 def trataPOST(content):
 
     # webhooks aqui
-    # resposta as perguntas via webexteams
-    # trata mensagem quando nao e' gerada pelo bot. Se nao e' bot, entao usuario
-    try:     
+   
+    try:
+        # resposta as perguntas via webexteams
+        # trata mensagem quando nao e' gerada pelo bot. Se nao e' bot, entao usuario     
         if content['name']==webhook_name and content['data']['personEmail']!=botmail:
             # identifica id da mensagem
             msg_id=(content['data']['id'])
             # identifica dados da mensagem
-            webextalk=getwebexMsg(msg_id)
-            usermail=webextalk[2]
-            mensagem=webextalk[0]
-            sala=webextalk[1]
+            mensagem,sala,usermail=getwebexMsg(msg_id)
+            #usermail=webextalk[2]
+            #mensagem=webextalk[0]
+            #sala=webextalk[1]
 
             # executa a logica
             msg,arquivo=logica(mensagem,usermail)
