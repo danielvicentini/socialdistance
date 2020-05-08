@@ -282,7 +282,7 @@ def logica(comando,usermail):
             # mensgem padrão caso não se identifique o que se espera nas próximas condições
             msg_titulo="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
             msg_param="Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")+"***  \n"
-            msg=msg_titulo+msg_param+"***Digite os parametros separados por virgulas.  \nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
+            msg=msg_titulo+msg_param+"Digite os parametros separados por virgulas.  \nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
 
             # trata aqui se parametros estão ok
 
