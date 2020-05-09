@@ -1,28 +1,28 @@
-{
+ï»¿{
 	"opcoes": [{
 		"tag": "configura aplica",
-		"title": "Aplicar as configurações feitas",
-		"desc": "Esta opção vai aplicar as configurações que vc alterou.",
+		"title": "Aplicar as configuraÃ§Ãµes feitas",
+		"desc": "Esta opÃ§Ã£o vai aplicar as configuraÃ§Ãµes que vc alterou.",
 		"option": 11,
 		"req": true,
 		"params": "salvar"
 	}, {
 		"tag": "configurar distanc sala",
 		"title": "Configurar distanciamento na Sala",
-		"desc": "Esta opção vai definir a regra de distanciamento de pessoas numa sala.  \nO número que vc informar para um determinada sala  \nserá o critério aplicado.",
+		"desc": "Esta opÃ§Ã£o vai definir a regra de distanciamento de pessoas numa sala.  \nO nÃºmero que vc informar para um determinada sala  \nserÃ¡ o critÃ©rio aplicado.",
 		"option": 12,
 		"req": true,
 		"params": "Nome da Sala, No. de pessoas por sala"
 	}, {
 		"tag": "historico uso",
 		"title": "Mostrar o historico de uso",
-		"desc": "Esta opção vai informar como esta a política de distaciamento para vc entender se ela está sendo utilizada.",
+		"desc": "Esta opÃ§Ã£o vai informar como esta a polÃ­tica de distaciamento para vc entender se ela estÃ¡ sendo utilizada.",
 		"option": 31,
 		"req": false
 	}, {
 		"tag": "inventario invent",
 		"title": "Mostrar o inventario",
-		"desc": "Esta opção vai mostrar o inventário de equipamentos técnicos sendo usados.",
+		"desc": "Esta opÃ§Ã£o vai mostrar o inventÃ¡rio de equipamentos tÃ©cnicos sendo usados.",
 		"option": 51,
 		"req": false
 	}]
