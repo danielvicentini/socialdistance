@@ -9,8 +9,6 @@ import json
 
 # opçoes
 # roadmap: 1) Arquivo JSON DONE, 2) GET num site http
-"""
-# comentado, opções agora no arquivo options.json
 novas_opcoes={
 	"opcoes": [{
 		"tag": "configura aplica",
@@ -40,7 +38,9 @@ novas_opcoes={
 		"req": False	
 	}]
 }
+
 """
+# não acertei ainda isto no heroku: dificultado para ler o arquivo devido a codificação
 novas_opcoes=dict()
 # carrega opcoes do arquivo options.json
 try:
@@ -49,7 +49,7 @@ try:
     novas_opcoes=data
 except:
     print ("erro na leitura do arquivo de opçoes")
-
+"""
 
 def opcoes_para_user():
     
