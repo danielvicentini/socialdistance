@@ -8,7 +8,9 @@ import json
 #versao nova
 
 # opçoes
-# roadmap: 1) Arquivo JSON, 2) GET num site http
+# roadmap: 1) Arquivo JSON DONE, 2) GET num site http
+"""
+# comentado, opções agora no arquivo options.json
 novas_opcoes={
 	"opcoes": [{
 		"tag": "configura aplica",
@@ -38,6 +40,15 @@ novas_opcoes={
 		"req": False	
 	}]
 }
+"""
+novas_opcoes=dict()
+# carrega opcoes do arquivo options.json
+try:
+    with open('options.json') as json_file:
+        data=json.load(json_file)
+    novas_opcoes=data
+except:
+    print ("erro na leitura do arquivo de opçoes")
 
 
 def opcoes_para_user():
@@ -362,7 +373,8 @@ def logica(comando,usermail):
                         msg= msg+"  \nLembre-se de separar os comandos por vírgulas.  \n"
                         memoria[usermail]['typing']=True
                         # sendo sim, significa agora que está a espera de parametros
-                        
+                    else:
+                        msg=msg_titulo+"Estou aguardando que você responda ***sim***. Na dúvida digite ***não*** ou ****reinicie***.  \n"    
 
 
         # 4)  se usuário cancelou a conversa  então este bloco recomeça
