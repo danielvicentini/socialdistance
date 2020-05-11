@@ -2,54 +2,13 @@
 from webexteams import getwebexMsg, webexmsgRoomviaID
 import json
 
-# ver 1.4 - 7.5.20
+# ver 1.5 - 11.5.20
 
-# opcoes de comandos
-#versao nova
+#### FUNÇÕES A RESPEITO DAS OPÇÕES/COMANDOS DISPONÍVEIS AO USUÁRIO
+#####################################################################
 
-# opçoes
-# roadmap: 1) Arquivo JSON DONE, 2) GET num site http
-novas_opcoes={
-	"opcoes": [{
-		"tag": "configura aplica",
-		"title": "Aplicar as configurações feitas",
-        "desc":"Esta opção vai aplicar as configurações que vc alterou.",
-		"option": 11,
-		"req": True,
-		"params": "salvar"
-	}, {
-		"tag": "configurar distanc sala",
-		"title": "Configurar distanciamento na Sala",
-        "desc":"Esta opção vai definir a regra de distanciamento de pessoas numa sala.  \nO número que vc informar para um determinada sala  \nserá o critério aplicado.",
-		"option": 12,
-		"req": True,
-		"params": "Nome da Sala, No. de pessoas por sala"
-    }, {
-        "tag": "historico uso",
-		"title": "Mostrar o historico de uso",
-        "desc" : "Esta opção vai informar como esta a política de distaciamento para vc entender se ela está sendo utilizada.",
-		"option": 31,
-		"req": False
-	}, {
-        "tag": "inventario invent",
-		"title": "Mostrar o inventario",
-        "desc": "Esta opção vai mostrar o inventário de equipamentos técnicos sendo usados.",
-		"option": 51,
-		"req": False	
-	}]
-}
-
-"""
-# não acertei ainda isto no heroku: dificultado para ler o arquivo devido a codificação
-novas_opcoes=dict()
-# carrega opcoes do arquivo options.json
-try:
-    with open('options.json') as json_file:
-        data=json.load(json_file)
-    novas_opcoes=data
-except:
-    print ("erro na leitura do arquivo de opçoes")
-"""
+# Funcão para retornar menu com opções ao usuário
+# Estas funções são chamadas dentro da logica
 
 def opcoes_para_user():
     
@@ -66,6 +25,9 @@ def opcoes_para_user():
 
     return msg
 
+# Função que retorna dados a respeito de cada opção
+# Ex: se requer parametros, quais as tags
+
 def optparam(codigo,item):
     
     # investiga nas opcoes existentes para o user
@@ -81,6 +43,9 @@ def optparam(codigo,item):
         c+=1
 
     return dado
+
+# Função que sugere melhor comando de acordo com o entendimento do usuário
+# Entendimento é feito comparando o que o usuário escreveu com o valor da "tag" da opção    
 
 def sugere_opcao(comando):
 
@@ -129,6 +94,9 @@ def sugere_opcao(comando):
         return 0
 
 
+# Função que inicia valores para um usuário conversando com o robo
+# iniciar valores = convesarsa começando do zero.
+
 def reinicia_user(usermail):
     
     global aguardando
@@ -141,10 +109,35 @@ def reinicia_user(usermail):
         var={ 'wait':False, 'option':0, 'req':False, 'params':False, 'typed':'','typing':False}
         memoria[usermail]=var
         aguardando=memoria[usermail]['wait']
-        #print ('criado variáveis para user')
     except:
         pass
 
+
+#### PROGRAMA PRINCIPAL
+
+
+# 0) Inicio
+# leitura do arquivo de opcoes
+
+# opçoes
+# roadmap: 1) Arquivo JSON DONE, 2) GET num site http
+
+# NOTA IMPORTANTE:
+# O Arquivo json precisa ser salvo em UTF-8 e EOL deve ser Unix LF
+# Usar o notepad++ para isto
+# do contrário dará erro na leitura do arquivo no Unix
+
+novas_opcoes=dict()
+# carrega opcoes do arquivo options.json
+try:
+    with open('options.json',encoding='utf-8') as json_file:
+        data=json.load(json_file)
+    novas_opcoes=data
+except:
+    print ("erro na leitura do arquivo de opçoes")
+
+# 1) logica
+# É chamado a medida que um comando chega do usuário, seja via console (testes) ou via http (produção)
 
 def logica(comando,usermail):
    
@@ -154,19 +147,13 @@ def logica(comando,usermail):
 
     # faz a logica de entender o comando pedido e a devida resposta para o usuario
     # o parametro usermail e' utilizado para identificar o usuario que solicitou o comando
-    # O usuario pode ser uzado como filtro para se executar ou negar o comando
-    #
     # Retorna mensagem para ser enviada para console ou Webex teams
     
     #Separa o comando por espacos
     #Primeiro item e'o comando em si, os demais sao parametros deste comando
-    #
     comando=comando.lower()
     sp=comando.split(" ")
-    
-    # comando na variavel box, lower deixa em minusculo para normalizar
-    #box=sp[0]
-    
+        
     # 21.11.19
     # variavel arquivo para o caso do bot devolver arquivos anexados
     arquivo=""
@@ -174,7 +161,6 @@ def logica(comando,usermail):
     # no final, a função retorna o conteúdo de arquivo e msg = texto do robo
     msg=""
 	
-
     # passo 1) recupera a conversa, caso ja tenha comecado
     # Do contrario entende que é uma conversa nova
 
@@ -190,34 +176,25 @@ def logica(comando,usermail):
     try:
         # recupera o estado da memoria
         aguardando=memoria[usermail]['wait']
-        #print ('recuperando memoria')
         
     except:
         # se chegamos aqui, usuario esta se comunicando pela primeira vez,
         # protanto variaveis serao criadas
         reinicia_user(usermail)
         aguardando=memoria[usermail]['wait']
-        #print ('criado variáveis para user')
-    
-    #print(aguardando)
-    
-
+        
     # 2) Análise
     # Caso esteja no começa da conversa, este bloco entende o que o usuário quer fazer
 
-    #este bloco é para o caso do robo não saber ainda o que o user quer:
+    # 2.1 este bloco é para o caso do robo não saber ainda o que o user quer:
     if aguardando==False:
         
-        # 2a. teste se user pediu ajuda
+        # 2.1a. teste se user pediu ajuda
         if "ajuda" in comando:
             # roda as opcaoes disponives
             msg=opcoes_para_user()
-
-            #print (x)
-
                 
-        #2b. tenta adivinhar o comando consultando os comandos disponiveis
-
+        #2.1b. tenta adivinhar o comando consultando os comandos disponiveis
         # caso ele encontre uma opcao, apresenta e apos isto o robo entra em modo de espera
 
         if msg=="" and len(sp)>0 and len(comando)>=5:
@@ -228,37 +205,61 @@ def logica(comando,usermail):
                 memoria[usermail]['option']=opescolhido
                 memoria[usermail]['wait']=True
                 memoria[usermail]['req']=optparam(opescolhido,"req")
+                if memoria[usermail]['req']==False:
+                    # Se comando nao requer parametros, então ele está pronto para a logica de execucao
+                    memoria[usermail]['params']=True
+                else:
+                    # Se o comando requer parametros, entao o prox passo é a logica de entrada de parametros
+                    memoria[usermail]['params']=False
+
                 msg="Você quiz dizer: "+str(optparam(opescolhido,"title"))+" ?  \n"
 
                 # Se chegou até aqui... na próxima interação robo fica a espera da continuidade da conversa
  
-        # 2c nada conhecido, então devolve msg padrão
+        # 2.1c nada conhecido, então devolve msg padrão
 
         if msg=="":
             msg="Olá. Digite ***ajuda*** para ver as opçoes disponíveis.  \nVou tentar adivinhar também o que você está procurando :-)  \n"
 
-    # 3) Aguardando
+    # 3) Conversando
     # Caso conversa já iniciado, usa este bloco
-    # Aqui varios ramos da conversa existe
-    # 1o Aguardo o comando
 
+    # vai por este caminho se o robo espera resposta do usuario
     if aguardando==True:
-  
-        # vai por este caminho se o comando identificado não precisa de parametros
-        # basicamente o robo aguarda um sim ou nao
-        if memoria[usermail]['req']==False:
 
-            # mensagem padrão caso não se identifique o que se espera nas próximas condições
-            msg="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
-            msg=msg+"Se é isto digite ***sim***. Na dúvida digite ***não*** e dai vc pode ver o que fazer digitando ***ajuda***."
+        # resgata o código do comando em questão
+        codigo=memoria[usermail]['option']
+    
+        # Textos padrão
+        msg_titulo="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
+        msg_sn="Diga ***sim*** ou ***ok*** para continuar ou digite ***não*** ou ***reinicie*** para recomeçarmos.  \n"   
+        msg_ready="Estou pronto para executar seu comando.  \n"
 
-            if "sim" in comando:
+        # Se chegou até aqui, robo aguarda sim ou não para executar o comando
+        if memoria[usermail]['params']==True:
+            
+            # resgata parametros caso comando precise deles
+            if memoria[usermail]['req']==True:
+                parametros=memoria[usermail]['typed']
+                msg_params="Voce digitou os parâmetros : ("+parametros+")  \n"
+             
+            if "sim" in comando or 'ok' in comando:
             # se chegou aqui no Sim, vai executar se achar funcões para o código desejado
                 msg="vou executar o que você me pediu:  \n"
                 
-                # executa comandos que não precisa de parametros
-                # resgata o código
-                codigo=memoria[usermail]['option']
+                #---------------------------------------------------------------------------------
+                # DIGITE SUA INTERPRETAÇÃO DE CÓDIGOS AQUI
+                # codigo = codigo do comando
+                # parametros = string com os parametros digitados pelo usuario, separado por virgulas
+                # o resultado do seu código deve ser atribuido a variavel msg
+
+                if codigo==11:
+                    # funcao inventario
+                    msg=msg+"Executando a aplicacão da config..."
+                                            
+                if codigo==12:
+                    # funcao inventario
+                    msg=msg+"Executando a config da distancia..."
 
                 if codigo==51:
                     # funcao inventario
@@ -272,112 +273,78 @@ def logica(comando,usermail):
                         c+=1
                     msg=msg+saida
 
-                elif codigo==31:
+                if codigo==31:
                     # funcao historico
                     msg=msg+"  \nO histórico é o seguinte:  \n"
                     msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
                     msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
 
+                #------------------------------------
+                # FIM DO BLOCO PARA INTERPRETAÇÃO DE CÓDGIOS       
+                    
                 msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
                 # uma vez que serviço entregue, zera a memória da conversa
-                reinicia_user(usermail)    
-            
-        
-        # vai neste caminho se o comando identificado precisa de parametros
-        # o robo aguarda os parametros para dali executar as funcoes
+                reinicia_user(usermail) 
 
+            else:
 
-        # Começa aqui se robo está aguardando parametros
-        elif memoria[usermail]['req']==True:
-            
-            # mensgem padrão caso não se identifique o que se espera nas próximas condições
-            msg_titulo="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
-            msg_param="Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")+"***  \n"
-            msg=msg_titulo+msg_param+"Digite os parametros separados por virgulas.  \nNa dúvida digite ***não*** ou ***reinicie*** para recomeçarmos."
+                # caso ainda não tenha digitado o sim, então pede o prox passo:
 
-            # trata aqui se parametros estão ok
-
-            # Se chegou aqui é por que parametros estão prontos
-            if memoria[usermail]['params']==True:
-
-                # resgata o que foi digitado como parametros
-                parametros=memoria[usermail]['typed']
-
-                if "sim" in comando or 'ok' in comando:
-                # se chegou aqui no Sim, vai executar se achar funcões para o código desejado
-                    msg="Vou executar o que você me pediu:  \n"
-                    
-                    # executa comandos que não precisa de parametros
-                    # resgata o código
-                    codigo=memoria[usermail]['option']
-                    
-                    if codigo==11:
-                        # funcao inventario
-                        msg=msg+"Executando a aplicacão da config..."
-                                                
-                    if codigo==12:
-                        # funcao inventario
-                        msg=msg+"Executando a config da distancia..."
-
-                       
-                    msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
-                    # uma vez que serviço entregue, zera a memória da conversa
-                    reinicia_user(usermail) 
-
+                # mensagem do robo caso comando requer parametros
+                if memoria[usermail]['req']==True:
+                    msg=msg_titulo+msg_params+msg_ready+msg_sn
                 else:
-                    # caso ainda não tenha digitado o sim, então pede o prox passo:
-                    msg=msg_titulo+"Voce digitou os parâmetros ("+parametros+") e estou pronto para executar com estes parametros  \n"
-                    msg=msg+"Diga ***sim*** ou ***ok*** que eu executo ou digite ***não*** ou ***reinicie*** para recomeçarmos.  \n"   
-        
+                # mensagem do robo caso comando nao requer parametros
+                    msg=msg_titulo+msg_ready+msg_sn
+                
+        # se chegou aqui, aguarda parametros, mas ainda não estão prontos
+        elif memoria[usermail]['params']==False:
             
-            elif memoria[usermail]['params']==False:
-            # se chegou aqui, aguarda parametros, mas ainda não estão prontos
-
-            
-                if memoria[usermail]['typing']==True:
-                    # fica neste modo a espera dos parametros
-                    # quando qtde de comandos está ok, define que qtde de parametros esta correta
-                                        
-                    #copia ultimo comando para memoria
-                    memoria[usermail]['typed']=comando
-                    parametros=memoria[usermail]['typed']
-                    
-                    # testa se qtde de comandos está ok
-                    # lista de comandos que se espera
-                    parametros_esperados=(optparam(memoria[usermail]['option'],"params").split(","))
-                    # lista de comandos digitadaos
-                    parametros_digitados=(parametros.split(","))
-                    
-                    # testa se qtde de comandos está ok
-                    if len(parametros_esperados) == len(parametros_digitados):
-                        texto=""
-                        c=0
-                        while c<len(parametros_digitados):
-                            texto=texto+parametros_esperados[c]+"="+parametros_digitados[c]+" "
-                            c+=1
-                        # Se chegou até aqui, avisa agora que falta só o sim
-                        msg=msg_titulo
-                        msg=msg+"Parametros digitados: "+texto
-                        msg=msg+"  \nConfirma? Diga ***sim*** ou ***ok*** para executar. Digite ***não*** ou ***reinicie*** para recomeçar.  \n"
-                        memoria[usermail]['params']=True
-                    else:
-                        # informa que ainda falta qtde de parametros
-                        msg="Falta parâmetros para o comando. Tente de novo.  \n"
-                        msg=msg+msg_param
+            if memoria[usermail]['typing']==True:
+                # fica neste modo a espera dos parametros
+                # quando qtde de comandos está ok, define que qtde de parametros esta correta
+                                    
+                #copia ultimo comando para memoria
+                memoria[usermail]['typed']=comando
+                parametros=memoria[usermail]['typed']
+                
+                # testa se qtde de comandos está ok
+                # lista de comandos que se espera
+                parametros_esperados=(optparam(memoria[usermail]['option'],"params").split(","))
+                # lista de comandos digitadaos
+                parametros_digitados=(parametros.split(","))
+                
+                # testa se qtde de comandos está ok
+                if len(parametros_esperados) == len(parametros_digitados):
+                    texto=""
+                    c=0
+                    while c<len(parametros_digitados):
+                        texto=texto+parametros_esperados[c]+"="+parametros_digitados[c]+" "
+                        c+=1
+                    # Se chegou até aqui, avisa agora que falta só o sim
+                    msg=msg_titulo
+                    msg=msg+"Parametros digitados: "+texto+ "  \n"
+                    msg=msg+msg_sn
+                    memoria[usermail]['params']=True
+                else:
+                    # informa que ainda falta qtde de parametros
+                    msg_param="Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")+"***  \n"
+                    msg_type="Digite os parametros separados por virgulas.  \n"
+                    msg=msg_titulo+msg_param+msg_type+msg_sn
 
 
                # se chegou aqui, aguarda user dizer se é o comando inicialmente está correto ou não
-                if memoria[usermail]['typing']==False:
-                    if 'sim' in comando:
-                        msg= "Ok. Digite os parametros para completar o comando:"+(optparam(memoria[usermail]['option'],"params"))
-                        msg= msg+"  \nLembre-se de separar os comandos por vírgulas.  \n"
-                        memoria[usermail]['typing']=True
-                        # sendo sim, significa agora que está a espera de parametros
-                    else:
-                        msg=msg_titulo+"Estou aguardando que você responda ***sim***. Na dúvida digite ***não*** ou ****reinicie***.  \n"    
+            else:
+                if 'sim' in comando or 'ok' in comando:
+                    msg= "Ok. Digite os parametros para completar o comando:"+(optparam(memoria[usermail]['option'],"params"))
+                    msg= msg+"  \nLembre-se de separar os comandos por vírgulas.  \n"
+                    memoria[usermail]['typing']=True
+                    # sendo sim, significa agora que está a espera de parametros
+                else:
+                    msg=msg_titulo+"Estou aguardando que você responda ***sim*** ou ***ok***. Na dúvida digite ***não*** ou ****reinicie***.  \n"    
 
 
-        # 4)  se usuário cancelou a conversa  então este bloco recomeça
+        # 4)  Usuário cancelou a conversa  então este bloco recomeça
 
         # Reinicia conversa se usuario pedir
         if 'reinicie' in comando or "não" in comando or "nao" in comando:
