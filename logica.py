@@ -21,7 +21,7 @@ def opcoes_para_user():
         msg=msg+novas_opcoes['opcoes'][c]['desc']+"  \n"
         c+=1
     
-    msg=msg+"  \nDigitel partes do comando para começarmos nossa conversa.  \n"
+    msg=msg+"  \nDigite partes do comando para começarmos nossa conversa.  \n"
 
     return msg
 
@@ -246,22 +246,26 @@ def logica(comando,usermail):
             if "sim" in comando or 'ok' in comando:
             # se chegou aqui no Sim, vai executar se achar funcões para o código desejado
                 msg="vou executar o que você me pediu:  \n"
-                
+
+               
+                # Os parametros digitados estao na variavel do tipo lista abaixo
+                lista_parametros=memoria[usermail]['typed'].split(",")
+ 
                 #---------------------------------------------------------------------------------
                 # DIGITE SUA INTERPRETAÇÃO DE CÓDIGOS AQUI
                 # codigo = codigo do comando
-                # parametros = string com os parametros digitados pelo usuario, separado por virgulas
+                # lista_parametros = lista com os parametros digitados pelo usuario, separado por virgulas
                 # o resultado do seu código deve ser atribuido a variavel msg
 
                 if codigo==11:
                     # funcao inventario
                     msg=msg+"Executando a aplicacão da config..."
                                             
-                if codigo==12:
+                elif codigo==12:
                     # funcao inventario
                     msg=msg+"Executando a config da distancia..."
 
-                if codigo==51:
+                elif codigo==51:
                     # funcao inventario
                     c=0
                     saida = "  \nSegue o inventário:  \n"
@@ -273,15 +277,33 @@ def logica(comando,usermail):
                         c+=1
                     msg=msg+saida
 
-                if codigo==31:
+                elif codigo==31:
                     # funcao historico
                     msg=msg+"  \nO histórico é o seguinte:  \n"
                     msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
                     msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
 
+                
+                
+
+
+
+
+
+
+
+
+
+
+
+
                 #------------------------------------
                 # FIM DO BLOCO PARA INTERPRETAÇÃO DE CÓDGIOS       
-                    
+
+                else:
+                    msg="Não encontrei um forma de executar o comando que você me pediu devido a um erro na minha programação.  \n"
+
+
                 msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
                 # uma vez que serviço entregue, zera a memória da conversa
                 reinicia_user(usermail) 
