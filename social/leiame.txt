@@ -1,0 +1,3 @@
+Codigo teste para gerar dados dos sensores
+Enviar para freeboard
+Envia alerta para teams
