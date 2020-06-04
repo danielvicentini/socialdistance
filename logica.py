@@ -1,5 +1,5 @@
 ﻿from config import memoria, botmail, webhook_name, configuracao
-from webexteams import getwebexMsg, webexmsgRoomviaID
+from webexteams import getwebexMsg, webexmsgRoomviaID, getwebexRoomID, getwebexUserID, webexmsgUser
 import json
 
 # ver 1.5 - 11.5.20
@@ -411,11 +411,53 @@ def trataPOST(content):
             #sala=webextalk[1]
 
             # executa a logica
-            msg,arquivo=logica(mensagem,usermail)
+            try:
+                msg,arquivo=logica(mensagem,usermail)
+            except:
+                print ("Erro de logica.")
         
             # Envia resposta na sala apropriada
             webexmsgRoomviaID(sala,msg,arquivo)
 
+    
     except:
-            print("POST nao reconhecido")
-            pass
+        print ("não é webhook")
+
+    # código para tratar alarmes
+    # formato do alarme esperado:
+
+    #{"alarm": "distance-bot",
+    #"data": {
+    #    "type": "00",
+    #    "message": "Mensagem para o user",
+    #    "who": "lista de pessoas para avisar"
+    #}}
+
+    # valida se POST é do tipo alarme esperado
+    try:
+        if content['alarm']=="distance-bot":
+            # texto que veio do alarme
+            txt_alarm=content['data']['message']
+            # lista de pessoas (emails) separados por virgulas
+            pessoas=list(content['data']['who'].split(','))
+            # tipo de alarme
+            # 00 = mensagem para individuo(s), 01 = mensagem para admin(s)
+            tipo_alarme=content['data']['type']
+            print (f'msg={txt_alarm} avisar={pessoas}')
+
+            if tipo_alarme=="00":
+                # Alarme para individuos
+                # pessoas pode conter um email ou uma lista de emails 
+                for b in pessoas:
+                    webexmsgUser(b,txt_alarm)
+                    
+            if tipo_alarme=="01":
+                # Alarme do tipo aviso para admin
+                # Envia nota para Sala dos Admins/Facility manager
+                sala=getwebexRoomID("Distanciamento Piloto")
+                webexmsgRoomviaID(sala,txt_alarm,"")
+
+    except:
+        print ("não é alarme.")
+
+

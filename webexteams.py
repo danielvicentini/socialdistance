@@ -255,6 +255,23 @@ def getwebexMsg(msgID):
 	return mensagem.text,mensagem.roomId,mensagem.personEmail
 
 
+def webexmsgUser(user,msg):
+
+    # Manda 1 msg para 1 user específico baseado no email informado
+    # caso não consiga, retorna erro
+
+    try:
+        # coleta id do usuario pelo seu email
+        usuario=getwebexUserID(user)
+        # envia
+        api.messages.create(toPersonId=usuario,markdown=msg)
+        resultado="ok"
+    except:
+        resultado="erro"
+    pass
+
+
+
 def webexmsgRoom(sala,msg):
 
 	# Manda msg para 1 sala especifica, procurando salas onde estou (usando partes do nome informado em sala).
