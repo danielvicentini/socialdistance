@@ -13,7 +13,7 @@ if msg=="erro":
 
 
 #Formato de execucao em modo console (teste)
-formato = "c"
+formato = "w"
 
 if formato=="c":
 
