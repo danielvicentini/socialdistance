@@ -345,7 +345,7 @@ def logica(comando,usermail):
                     mask=configa['data']['mask']
                     distance=configa['data']['distance']
                     tracing=configa['data']['tracing']
-                    msg=f"Admins: {admins}\n Monitorando a Distancia: {distance}\n Max Pessoas: {max}\n Intervalo de Pesquisa: {interval}\n Detectar Mascara:{mask}\n Detectar Tracing:{tracing}\n"
+                    msg=f"Admins: {admins}  \n Monitorando a Distancia: {distance}  \n Max Pessoas: {max}  \n Intervalo de Pesquisa: {interval}  \n Detectar Mascara:{mask}  \n Detectar Tracing:{tracing}  \n"
                     
                     
 
