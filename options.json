@@ -1,17 +1,46 @@
 {	"opcoes": [{
-		"tag": "configura aplica",
+		"tag": "aplicar setup",
 		"title": "Aplicar as configurações feitas",
 		"desc": "Esta opção vai aplicar as configuracoes que vc alterou.",
 		"option": 11,
 		"req": true,
-		"params": "salvar"
+		"params":"PIN"
 	}, {
-		"tag": "configurar distanc sala",
+		"tag": "configurar distancia sala",
 		"title": "Configurar distanciamento na Sala",
-		"desc": "Esta opção vai definir a regra de distanciamento de pessoas numa sala.  \nO numero que vc informar para um determinada sala  \nserá o critério aplicado.",
+		"desc": "Esta opção vai definir a regra de distanciamento de pessoas.  \nO numero que vc informar para um determinada sala  \nserá o critério aplicado.",
 		"option": 12,
 		"req": true,
-		"params": "Nome da Sala, No. de pessoas por sala"
+		"params": "No. de pessoas por sala"
+	}, {
+		"tag": "configurar intervalo rastreio",
+		"title": "Configurar intervalo de rastreio",
+		"desc": "Esta opção vai definir o periodo que os dados serão coletados.",
+		"option": 13,
+		"req": true,
+		"params": "tempo (em minutos)"
+	}, {
+		"tag": "ativar distanciamento",
+		"title": "Ativar monitoria de distanciamento",
+		"desc": "Esta opção ativa a monitoria de distanciamento.",
+		"option": 14,
+		"req": true,
+		"params": "on or off"
+	}, {
+		"tag": "ativar deteccao mascara",
+		"title": "Ativar detecçao de pessoas sem máscara",
+		"desc": "Esta opção ativa a análise de presença de pessoas sem máscara.",
+		"option": 15,
+		"req": true,
+		"params": "on or off"
+	}, {
+		"tag": "ativar rastreio pessoas",
+		"title": "Ativar Rastreamento das pessoas",
+		"desc": "Esta opção ativa a análise da movimentacao de pessoas nas salas.",
+		"option": 16,
+		"req": true,
+		"params": "on or off"
+				
 	}, {
 		"tag": "historico uso",
 		"title": "Mostrar o historico de uso",
@@ -24,5 +53,18 @@
 		"desc": "Esta opção vai mostrar o inventario de equipamentos técnicos sendo usados.",
 		"option": 51,
 		"req": false
+	}, {
+		"tag": "configura configuracao rodando",
+		"title": "Mostrar configuração rodando.",
+		"desc": "Mostra as configurações ativas",
+		"option": 52,
+		"req": false
+	}, {
+		"tag": "configura configuracao salva",
+		"title": "Mostrar configuração salva.",
+		"desc": "Mostra as configurações salvas",
+		"option": 53,
+		"req": false
+		
 	}]
 }

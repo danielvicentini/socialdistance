@@ -11,7 +11,7 @@ botmail="infobot@sparkbot.io"
 webhook_url=os.environ['WEBHOOK_URL']
 # exemplo webhook_url="https://mywebhook.com"
 # webhook_name e' o nome do gatilho que o Webex Teams gera para seu aplicativo entender
-webhook_name="distancebot-heroku"
+webhook_name="distancebot"
 # exemplo webhook_name="meuprimeirochatbot"
 
 # Novidade 27.4.20
@@ -33,3 +33,23 @@ configuracao ={
 			"sala": "Reunião",
 			"access-point": "AP-2",
 			"distancia": 30 }]}
+
+# nova config 8.6.20
+# PIN = senha para comitar alteraçoes
+# admin = lista de pessoas que podem aplicar config
+# max = max pessoas numa sala/andar, interval = periodo de coleta de dados
+# distance True/False = liga desliga análise
+# mask True/False = liga desliga análise de mascara
+# 
+configa= {
+	"versao": "1",
+	"PIN": "2504",
+	"admin":"flcorrea,acassemi,dvicenti,maralves,aluciade,lpavanel",
+	"data": {
+		"max":30,
+		"interval":15,
+		"distance": False,
+		"mask": False,
+		"tracing": False
+	}
+}

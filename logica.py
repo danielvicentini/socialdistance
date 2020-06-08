@@ -1,4 +1,4 @@
-﻿from config import memoria, botmail, webhook_name, configuracao
+﻿from config import memoria, botmail, webhook_name, configuracao, configa
 from webexteams import getwebexMsg, webexmsgRoomviaID, getwebexRoomID, getwebexUserID, webexmsgUser
 import json
 
@@ -102,7 +102,9 @@ def reinicia_user(usermail):
     global aguardando
     global memoria
     global configuracao
-    
+    # config nova
+    global configa
+
     # reinicia variavies da memoria par ao usuario
     # robo vai comecar do zero com este usuario
     try:
@@ -144,6 +146,7 @@ def logica(comando,usermail):
     global aguardando
     global memoria
     global configuracao
+    global configa
 
     # faz a logica de entender o comando pedido e a devida resposta para o usuario
     # o parametro usermail e' utilizado para identificar o usuario que solicitou o comando
@@ -258,12 +261,68 @@ def logica(comando,usermail):
                 # o resultado do seu código deve ser atribuido a variavel msg
 
                 if codigo==11:
+                    pin=lista_parametros[0]
                     # funcao inventario
-                    msg=msg+"Executando a aplicacão da config..."
+                    if pin==configa['PIN']:
+                        msg=msg+"Executando a aplicacão da config..."
+                    else:
+                        msg="PIN não autorizado."
                                             
                 elif codigo==12:
-                    # funcao inventario
-                    msg=msg+"Executando a config da distancia..."
+                    distancia=lista_parametros[0]
+                    # funcao configura distancia
+                    msg=msg+"Executando a config da distancia... para "+str(distancia)
+                    configa['data']['max']=int(distancia)
+                             
+                elif codigo==13:
+                    intervalo=lista_parametros[0]
+                    # funcao configura intervalo
+                    msg=msg+"Executando a config do intervalo... para "+str(intervalo)
+                    configa['data']['interval']=int(intervalo)
+                    
+                elif codigo==14:
+                    parametro = lista_parametros[0]
+                    msg=msg+"Executando a monitoria de qtde de pessoas para... "
+                    if 'ok' in parametro or 'on' in parametro or 'sim' in parametro:
+                        # Ativa monitoria qtde pessoas
+                        msg=msg+parametro
+                        configa['data']['distance']=True
+                    elif 'off' in parametro:
+                        # Desativa monitoria qtde pessoas
+                        msg=msg+parametro
+                        configa['data']['distance']=False
+                    else:
+                        msg=msg+"Parametro nao compreendido. Não fiz nada."
+                
+                elif codigo==15:
+                    parametro = lista_parametros[0]
+                    msg=msg+"Executando a monitoria de mascara para... "
+                    if 'ok' in parametro or 'on' in parametro or 'sim' in parametro:
+                        # Ativa monitoria de Mascara
+                        msg=msg+parametro
+                        configa['data']['mask']=True
+                    elif 'off' in parametro:
+                        # Desativa monitoria de Mascara
+                        msg=msg+parametro
+                        configa['data']['mask']=False
+                    else:
+                        msg="Parametro nao compreendido. Não fiz nada."
+
+                elif codigo==16:
+                    parametro = lista_parametros[0]
+                    msg=msg+"Executando o rastreio de pessoas para... "
+                    if 'ok' in parametro or 'on' in parametro or 'sim' in parametro:
+                        # Ativa tracing
+                        msg=msg+parametro
+                        configa['data']['tracing']=True
+                    elif 'off' in parametro:
+                        # Desativa tracing
+                        msg=msg+parametro
+                        configa['data']['tracing']=False
+                        print (configa['data']['tracing'])
+                    else:
+                        msg="Parametro nao compreendido. Não fiz nada."
+
 
                 elif codigo==51:
                     # funcao inventario
@@ -276,6 +335,19 @@ def logica(comando,usermail):
                         saida=saida+"___  \n"+sala+ap+dist+"___  \n"
                         c+=1
                     msg=msg+saida
+
+                    
+                elif codigo==52:
+                    # config rodando
+                    admins=configa['admin']
+                    max=configa['data']['max']
+                    interval=configa['data']['interval']
+                    mask=configa['data']['mask']
+                    distance=configa['data']['distance']
+                    tracing=configa['data']['tracing']
+                    msg=f"Admins: {admins}\n Monitorando a Distancia: {distance}\n Max Pessoas: {max}\n Intervalo de Pesquisa: {interval}\n Detectar Mascara:{mask}\n Detectar Tracing:{tracing}\n"
+                    
+                    
 
                 elif codigo==31:
                     # funcao historico
@@ -422,6 +494,9 @@ def trataPOST(content):
     
     except:
         print ("não é webhook")
+
+
+    # alarmes aqui
 
     # código para tratar alarmes
     # formato do alarme esperado:
