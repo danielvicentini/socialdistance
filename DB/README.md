@@ -45,7 +45,7 @@ While the actual Database to be used is not available, pelase install a local co
 2. Install InfluxDB as specified here: https://docs.influxdata.com/influxdb/v1.8/introduction/install/
 3. Make sure that Influxd is running
 4. Enter in Influx console via the following command:  *influx -precision rfc3339*
-5. Create the database from the console: *> CREATE socialdistance*
+5. Create the database from the console: *> CREATE DATABASE socialdistance*
 
 </br>
 </br> 

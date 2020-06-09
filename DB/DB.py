@@ -3,6 +3,7 @@
 from influxdb import InfluxDBClient
 import DBconst as db
 import json
+import inventory
 
 class DBClient():
   """
@@ -20,16 +21,21 @@ class DBClient():
     self._client = InfluxDBClient(self._host, self._port, self._user, self._password, self._dbname)
 
 
-  def PeopleCountWrite(self, location: str, origin: str, count: int):
+  def PeopleCountWrite(self, serialnumber: str, count: int):
       """
       Write a PeopleCount point in the SocialDistance InfluxDB database.
 
       The following parameters are expected to instantiate a PeopleCount object:
 
-      :param location: Location associated to this count. Type=string. Valid values TBD.
-      :param origin: How this measurement was obtained. Type=string. Valid values TBD.
-      :count: QUantity of people detected in this location. Type = integer.
+      :param serialnumber: Serial number of the device used to get this counter
+      :count: Quantity of people detected in this location. Type = integer.
       """
+
+      #Obtain location and origin from device serial number
+      location, origin = inventory.DeviceInfo(serialnumber)
+      if location == None:
+        #return False to indicate error
+        return False
 
       # Prepare JSON with data to be writte in PeopleCount measurement
       json_body = {}
@@ -42,6 +48,10 @@ class DBClient():
 
       # Write data to InfluxDB
       self._client.write_points([json_body])
+
+      #Return True to indicate that data was recorded
+      return True
+
 
   def PeopleCountQuery(self, queryFilter=None):
     """

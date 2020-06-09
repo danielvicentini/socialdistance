@@ -2,7 +2,7 @@
 Definition of paramater that allow connecting to the SocialDistance DB
 """
 
-INFLUXDB_HOST = 'localhost'
+INFLUXDB_HOST = '159.89.238.176'
 INFLUXDB_PORT = 8086
 INFLUXDB_USER = 'root'
 INFLUXDB_PASSWORD = 'root'
