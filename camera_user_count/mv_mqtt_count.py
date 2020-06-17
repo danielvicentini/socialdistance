@@ -27,15 +27,18 @@ import os
 from pprint import pprint
 from webexteamssdk import WebexTeamsAPI
 
+sys.path.append('/home/mycode/socialdistance/DB')
+from DB import *
+
 # Get the absolute path for the directory where this file is located "here"
-here = os.path.abspath(os.path.dirname(__file__))
+#here = os.path.abspath(os.path.dirname(__file__))
 
 # Get the absolute path for the project / repository root
-project_root = os.path.abspath(os.path.join(here, ".."))
+#project_root = os.path.abspath(os.path.join(here, ".."))
 
 # Extend the system path to include the project root and import the env files
-sys.path.insert(0, project_root)
-import env_user  # noqa
+#sys.path.insert(0, project_root)
+#import env_user  # noqa
 
 
 
@@ -136,7 +139,18 @@ def publish_results(count, camera_results):
         """TODO
         Replace this with a function to post results on database instead
         """
-        post_data(results)
+        print(results["count_average"], latest_count)
+        print()
+        """
+        if results["count_average"] == latest_count:
+            print("Nothing changed, not updating the DB")
+            print()
+            latest_count == results["count_average"]
+            clear_counters()
+        else: write_on_db(results)
+        """
+        write_on_db(results)
+
     else:
         #print ("Printing every iteraction:")
         #print (camera_results)
@@ -153,6 +167,28 @@ def post_data(results):
 
     clear_counters()
 
+def write_on_db(results):
+    print("Enteri no write DB")
+    print (results)
+    #write on DB
+    db = DBClient()
+        
+    device_sn = results["camera_sn"]
+    count = results["count_average"]
+    print (device_sn, count)
+    # Write some data
+    db.PeopleCountWrite(device_sn, count)
+    #db.PeopleCountWrite("Q2PD-XNUL-RYYQ", 5)
+        
+    #Get written data
+    #result = db.PeopleCountQuery()
+    #print()
+    #print (result)
+    print ("DB updated with {}, {}".format(device_sn, count))
+        
+    clear_counters()
+
+
 def clear_counters():
     #print ("Reseting camera_results dict")           
     camera_results["counts"] = {}
@@ -164,13 +200,17 @@ def clear_counters():
     #print (count_list)
     #reset counter
     #print ("Resenting Counter to 0")
-
+    wait = 600
+    print("Waiting {} seconds..".format(wait))
+    print()
+    time.sleep(wait)
 
 if __name__ == "__main__":
     
     MQTT_TOPIC = "/merakimv/"+ CAMERA_SERIAL + "/0"
     
     publish_results.counter = 0
+    latest_count = 0
 
     # mqtt
     try:

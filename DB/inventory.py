@@ -6,9 +6,9 @@ DeviceInventory = [
    "Location": "Sala"
    },
   {
-   "SerialNumber": "Q2PD-XNUL-RYYQ",
+   "SerialNumber": "MR33_Sala",
    "Device": "WiFi",
-   "Nome": "MR33 Sala",
+   "Nome": "MR33_Sala",
    "Location": "Sala"
   },
   {
@@ -18,16 +18,22 @@ DeviceInventory = [
    "Location": "Cozinha"
   },
   {
-   "SerialNumber": "Q2ED-PVBD-U859",
+   "SerialNumber": "MR24_Cozinha",
    "Device": "WiFi",
    "Nome": "MR24_Cozinha",
    "Location": "Cozinha"
   },
   {
-   "SerialNumber": "Q2GD-R9UA-8CJK",
+   "SerialNumber": "MR18_Quartos",
    "Device": "WiFi",
-   "Nome": "MR18 Quartos",
+   "Nome": "MR18_Quartos",
    "Location": "Quartos"
+  },
+  {
+  "SerialNumber": "Q2GV-7HEL-HC6C",
+  "Device": "Camera",
+  "Nome": "MV_Sandbox",
+  "Location": "Sandbox"
   },
 ]
 

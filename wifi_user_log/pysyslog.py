@@ -17,7 +17,7 @@ HOST, PORT = "0.0.0.0", 514
 import logging
 import socketserver
 
-logging.basicConfig(level=logging.INFO, format='%(message)s', datefmt='', filename=LOG_FILE, filemode='a')
+logging.basicConfig(level=logging.INFO, format='%(message)s', datefmt='', filename=LOG_FILE, filemode='w')
 
 class SyslogUDPHandler(socketserver.BaseRequestHandler):
 
