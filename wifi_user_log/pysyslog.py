@@ -24,8 +24,10 @@ class SyslogUDPHandler(socketserver.BaseRequestHandler):
 	def handle(self):
 		data = bytes.decode(self.request[0].strip())
 		socket = self.request[1]
-		print( "%s : " % self.client_address[0], str(data))
-		logging.info(str(data))
+#[MA]: Only identity logs to be logged:
+		if ("identity" in str(data)):
+		    #print( "%s : " % self.client_address[0], str(data))
+		    logging.info(str(data))
 
 if __name__ == "__main__":
 	try:
