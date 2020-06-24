@@ -6,7 +6,6 @@ from datetime import datetime
 
 from pprint import pprint
 
-
 NET_ID = wifi_sensor_settings.MERAKI_NET_ID
 
 DASHBOARD = meraki.DashboardAPI(
@@ -24,12 +23,12 @@ def ApList ():
 #  [{'address': 'xxxx',
 #   'firmware': 'wired-14-53',
 #   'floorPlanId': None,
-#   'lat': -22.68889,
-#   'lng': -45.66139,
+#   'lat': -29.6889,
+#   'lng': -20.66139,
 #   'mac': '88:15:44:cc:d9:d8',
 #   'model': 'Z1',
 #   'name': 'Z1',
-#   'networkId': 'L_711568741124547009',
+#   'networkId': 'L_711509141124547009',
 #   'serial': 'Q0HN-4PA5-AXRB',
 #   'url': 'https://n264.meraki.com/Camera-appliance/n/TOJgRcie/manage/nodes/new_list/149624929966552',
 #   'wan1Ip': '192.168.15.45'}]
@@ -63,7 +62,7 @@ def ClientList (device_list:list):
 
     for device in device_list:
         client_list = (DASHBOARD.clients.getDeviceClients(device["serial"]))
-        #pprint(client_list)
+        pprint(client_list)
         i = 0
         user_list = []
         for client in client_list:
