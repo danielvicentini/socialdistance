@@ -1,17 +1,18 @@
-import os
+#import os
+from config_shared import bot_token, bot_email, bot_webhook, bot_tag
 
 # Ponha aqui os dados do seu robozinho
-bottoken=os.environ['TOKEN']
+bottoken=bot_token
 #exemplo='Yia0dsfdsfsdf...' - tirado do site developer.webex.com
-botmail="infobot@sparkbot.io"
+botmail=bot_email
 #exemplo='mybotmail@spark.io' - tirado do site developer.webex.com
 
 # Ponha aqui os dados do seu Webhook
 # webhook_url o endereco publico onde esta o app
-webhook_url=os.environ['WEBHOOK_URL']
+webhook_url=bot_webhook
 # exemplo webhook_url="https://mywebhook.com"
 # webhook_name e' o nome do gatilho que o Webex Teams gera para seu aplicativo entender
-webhook_name="distancebot"
+webhook_name=bot_tag
 # exemplo webhook_name="meuprimeirochatbot"
 
 # Novidade 27.4.20

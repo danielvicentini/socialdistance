@@ -1,7 +1,9 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+
+# Web server port
+from config_shared import bot_server_port
 import logging
 import json 
-import os
 from logica import trataPOST
 
 # http server
@@ -11,13 +13,15 @@ class S(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'text/html')
         self.end_headers()
 
+    # GET
+    # Does nothing today
+
     def do_GET(self):
         logging.info("GET request,\nPath: %s\nHeaders:\n%s\n", str(self.path), str(self.headers))
         self._set_response()
         self.wfile.write("GET request for {}".format(self.path).encode('utf-8'))
 
- 	    # POST valida se o que chega sem dados via o Webhook
-   	    # do POST e' que se chama a rotina de respnder ao usuario
+ 	# POST function
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
@@ -26,19 +30,17 @@ class S(BaseHTTPRequestHandler):
         self._set_response()
         self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
 
-	    # Conteudo
+	    # Content
         content=json.loads(post_data.decode('utf-8'))
 
-        # chama funcao para tratar POST
+        # call function to understand post
         trataPOST(content)
 
+ 
 
-    
-
-
-def run(server_class=HTTPServer, handler_class=S, port=int(os.getenv('PORT',8080))):
-        #Esta funcao roda efetivamente o servidor Web
-        # PORT usa variavel PORT (tipico de servicos PaaS) ou porta 8080 caso nao definida (tipico para teste local http://localhost:8080)
+def run(server_class=HTTPServer, handler_class=S, port=bot_server_port):
+        # Web Server run
+        # Server port comes from bot_server_port from config_shared
         logging.basicConfig(level=logging.INFO)
         server_address = ('', port)
         httpd = server_class(server_address, handler_class)

@@ -1,3 +1,8 @@
+# este grupo e' para chamar modulos que estao na pasta 'bot'
+import sys
+import os
+sys.path.append(os.path.abspath('bot'))
+
 from config import webhook_name, webhook_url
 from webexteams_console_tools import webexconsole
 from webexteams import ValidaWebhook
@@ -11,9 +16,8 @@ if msg=="erro":
     print ("Erro de Webhook")
 
 
-
 #Formato de execucao em modo console (teste)
-formato = "w"
+formato = "c"
 
 if formato=="c":
 

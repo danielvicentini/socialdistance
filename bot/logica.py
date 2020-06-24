@@ -1,4 +1,5 @@
-﻿from config import memoria, botmail, webhook_name, configuracao, configa
+﻿from config_shared import *
+from config import memoria, botmail, webhook_name, configuracao, configa
 from webexteams import getwebexMsg, webexmsgRoomviaID, getwebexRoomID, getwebexUserID, webexmsgUser
 import json
 
@@ -133,8 +134,8 @@ novas_opcoes=dict()
 # carrega opcoes do arquivo options.json
 try:
     with open('options.json',encoding='utf-8') as json_file:
-        data=json.load(json_file)
-    novas_opcoes=data
+        novas_opcoes=json.load(json_file)
+    
 except:
     print ("erro na leitura do arquivo de opçoes")
 
@@ -506,19 +507,33 @@ def trataPOST(content):
     #    "type": "00",
     #    "message": "Mensagem para o user",
     #    "who": "lista de pessoas para avisar"
+    #    "image": "endereço da imagem"
     #}}
 
     # valida se POST é do tipo alarme esperado
     try:
         if content['alarm']=="distance-bot":
+            
+            imagem=""
+
             # texto que veio do alarme
             txt_alarm=content['data']['message']
+            
             # lista de pessoas (emails) separados por virgulas
             pessoas=list(content['data']['who'].split(','))
+            
+            # tenta identificar imagem (opcional)
+            try:
+                imagem=content['data']['image']
+            except:
+                print ('Imagem não identificada')
+            
+
             # tipo de alarme
             # 00 = mensagem para individuo(s), 01 = mensagem para admin(s)
             tipo_alarme=content['data']['type']
-            print (f'msg={txt_alarm} avisar={pessoas}')
+            print (f'msg={txt_alarm} avisar={pessoas} imagem={imagem}')
+                        
 
             if tipo_alarme=="00":
                 # Alarme para individuos
@@ -526,11 +541,13 @@ def trataPOST(content):
                 for b in pessoas:
                     webexmsgUser(b,txt_alarm)
                     
-            if tipo_alarme=="01":
+            elif tipo_alarme=="01":
                 # Alarme do tipo aviso para admin
                 # Envia nota para Sala dos Admins/Facility manager
-                sala=getwebexRoomID("Distanciamento Piloto")
-                webexmsgRoomviaID(sala,txt_alarm,"")
+                sala=getwebexRoomID(admins_room)
+                webexmsgRoomviaID(sala,txt_alarm,imagem)
+            else:
+                print ('Nenhum cod de alarme conhecido')
 
     except:
         print ("não é alarme.")
