@@ -50,12 +50,12 @@ def ClientList (device_list:list):
 #If the same user is connected with 2 devices, it will count as one user
 #
 # This is what it returns:
-#  [{'ap_name': 'Z1',
-#   'ap_user_count': 1,
-#   'clients_identity': 'maralves@cisco.com',
-#   'last_update': '12:52:43'}]
+# [{'ap_name': 'Z1',
+#   'ap_user_count': 2,
+#   'clients_identity': ['lpavanel@cisco.com', 'maralves@cisco.com'],
+#   'last_update': '14:13:55'}]
 
-    user_list = []
+    device_clients_list = []
     wifi_count = []
     device_clients = {}
     now = datetime.now()
@@ -63,14 +63,17 @@ def ClientList (device_list:list):
 
     for device in device_list:
         client_list = (DASHBOARD.clients.getDeviceClients(device["serial"]))
+        #pprint(client_list)
         i = 0
+        user_list = []
         for client in client_list:
-            if "user" in client and client["user"] not in device_clients:
+            if ("user" in client and client["user"] not in device_clients.values()):
                 i += 1
+                user_list.append(client["user"])
                 device_clients = {
                     "ap_name" : device["name"],
                     "ap_user_count" : i,
-                    "clients_identity" : client["user"],
+                    "clients_identity" : user_list,
                     "last_update": last_update
                     }
         wifi_count.append(device_clients)
@@ -91,7 +94,7 @@ def CurrentAllUsers():
 def main ():
 #[MA]: Just for testing:
     current_wifi_users = ClientList(ApList())
-    print ("Wifi: " + str(current_wifi_users))  
+    pprint (current_wifi_users)  
 
 if(__name__ == "__main__"):
 #[MA]: Just for testing:
