@@ -1,3 +1,5 @@
+from meraki_initial_query import CurrentWifiUsers
+
 ## Parse the logfile genetated by the Syslog Server to capture
 ## WiFi users logging in and out.
 ## This version is only for 802.1x authenticated users
@@ -227,7 +229,7 @@ if __name__ == '__main__':
 	#
 	#At this point starting with a manual imput with zero clients
 	#code will handle the error inserted because of that
-	"""
+
 
 	wifi_count = [
 		{"ap_name": "MR33_Sala",
@@ -246,11 +248,12 @@ if __name__ == '__main__':
 		"last_update": ""
 		}
 		]
-
+"""
 	#idea for the wifi_count list including users mac address
 	#{"ap_name": ap_name, "ap_user_count": new_ap_user_count, "clients_identity": new_identity_list, "clients_mac": new_client_mac_list}
 	#not implemented with mac address because the logic is not ready to handle the scenario of a user with multiple devices
 
+	wifi_count = CurrentWifiUsers()
 	print()
 	print("Initial WiFi list is :")
 	print (wifi_count)
