@@ -4,8 +4,8 @@ admins_room="Distanciamento Piloto"
 # Admin list
 admins="flcorrea@cisco.com,dvicenti@cisco.com,maralves@cisco.com,lpavanel@cisco.com,analuciade@cisco.com"
 # Webex Bot parameters
-bot_webhook="http://distancebot.herokuapp.com"
-bot_token="MjU3NGQyODUtZjg2MC00MmQ0LThiYjUtMTUyZTNjODcyZTY3MGExNTRkYTktYTdh_PF84_1eb65fdf-9643-417f-9974-ad72cae0e10f"
+bot_webhook="http://address"
+bot_token="your bot token"
 bot_email="botuser@botdomain.com"
 bot_tag='distancebot'
 # Meraki Parameters
