@@ -2,7 +2,10 @@
 #
 import wifi_sensor_settings
 import meraki
+import json
 from datetime import datetime
+
+from bottle import route, run, request, post, get
 
 from pprint import pprint
 
@@ -14,6 +17,7 @@ DASHBOARD = meraki.DashboardAPI(
     print_console = False,
     output_log = False
     )
+
 
 def ApList ():
 #[MA]: This function collects a device list from meraki's dashboard
@@ -63,21 +67,28 @@ def ClientList (device_list:list):
     for device in device_list:
         client_list = (DASHBOARD.clients.getDeviceClients(device["serial"]))
         pprint(client_list)
-        i = 0
         user_list = []
         for client in client_list:
-            if ("user" in client and client["user"] not in device_clients.values()):
-                i += 1
+            if ("user" in client):
                 user_list.append(client["user"])
+                user_list = list(set(user_list))
                 device_clients = {
                     "ap_name" : device["name"],
-                    "ap_user_count" : i,
+                    "ap_user_count" : len(user_list),
                     "clients_identity" : user_list,
                     "last_update": last_update
-                    }
+                }
         wifi_count.append(device_clients)
 
     return wifi_count
+
+# GET
+@get('/wificount/CurrentWifiUsers')
+def getCurrentWifiUsers(): 
+#[MA]: Callable function for external usage
+    current_wifi_users = ClientList(ApList())
+    current_wifi_users_json = json.dumps(current_wifi_users)
+    return current_wifi_users_json
 
 def CurrentWifiUsers(): 
 #[MA]: Callable function for external usage
@@ -98,3 +109,4 @@ def main ():
 if(__name__ == "__main__"):
 #[MA]: Just for testing:
     main ()
+    run(host='localhost', port=7000, debug=True)

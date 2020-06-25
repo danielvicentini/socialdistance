@@ -1,4 +1,5 @@
 from meraki_initial_query import CurrentWifiUsers
+from pprint import pprint
 
 ## Parse the logfile genetated by the Syslog Server to capture
 ## WiFi users logging in and out.
@@ -254,7 +255,7 @@ if __name__ == '__main__':
 	wifi_count = CurrentWifiUsers()
 	print()
 	print("Initial WiFi list is :")
-	print (wifi_count)
+	pprint (wifi_count)
 	print()
 	print()
 
