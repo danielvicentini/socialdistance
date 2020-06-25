@@ -1,5 +1,6 @@
-from meraki_initial_query import CurrentWifiUsers
 from pprint import pprint
+import json
+import requests
 
 ## Parse the logfile genetated by the Syslog Server to capture
 ## WiFi users logging in and out.
@@ -213,54 +214,30 @@ add here the function that will update the wifi count status
 on the DB
 """
 
-
 if __name__ == '__main__':
 
 	#starting the dict logs and wifi_count list
 	log = {}
-	wifi_count = []
-
-
-	"""TODO
-	#make a function here to grab this info from Meraki
-	#get the list of AP and the users
-	#make the list wifi_count that has all the APs dict
-	#
-	#At this point starting with a manual imput with zero clients
-	#code will handle the error inserted because of that
-
-
-	wifi_count = [
-		{"ap_name": "MR33_Sala",
-		"ap_user_count": 0,
-		"clients_identity": [],
-		"last_update": ""
-		},
-		{"ap_name": "MR18_Quartos",
-		"ap_user_count": 0,
-		"clients_identity": [],
-		"last_update": ""
-		},
-		{"ap_name": "MR24_Cozinha",
-		"ap_user_count": 0,
-		"clients_identity": [],
-		"last_update": ""
-		}
-		]
-"""
 	#idea for the wifi_count list including users mac address
 	#{"ap_name": ap_name, "ap_user_count": new_ap_user_count, "clients_identity": new_identity_list, "clients_mac": new_client_mac_list}
 	#not implemented with mac address because the logic is not ready to handle the scenario of a user with multiple devices
 
-	wifi_count = CurrentWifiUsers()
-	print()
+	wifi_count_json = requests.get('http://localhost:7000/wificount/CurrentWifiUsers')	
+	wifi_count = json.loads(wifi_count_json.text)
+
 	print("Initial WiFi list is :")
 	pprint (wifi_count)
 	print()
 	print()
 
-	with open('youlogfile.log') as f:
-		while True:
-			line = f.readline()
-			if line:
-				syslog_parsing(line)
+	try:
+		with open('youlogfile.log') as f:
+			while True:
+				line = f.readline()
+				if line:
+					syslog_parsing(line)
+					#send_alert()
+	except (IOError, SystemExit):
+		raise
+	except KeyboardInterrupt:
+		print ("Crtl+C Pressed. Shutting down.")

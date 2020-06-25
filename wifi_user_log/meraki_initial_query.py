@@ -18,7 +18,6 @@ DASHBOARD = meraki.DashboardAPI(
     output_log = False
     )
 
-
 def ApList ():
 #[MA]: This function collects a device list from meraki's dashboard
 #and it filters for MRs and Z1s --> not considering MX wireless
@@ -64,10 +63,11 @@ def ClientList (device_list:list):
     now = datetime.now()
     last_update = now.strftime("%H:%M:%S")
 
+    user_list = []
     for device in device_list:
         client_list = (DASHBOARD.clients.getDeviceClients(device["serial"]))
         pprint(client_list)
-        user_list = []
+        user_list.clear
         for client in client_list:
             if ("user" in client):
                 user_list.append(client["user"])
