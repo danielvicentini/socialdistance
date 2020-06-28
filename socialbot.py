@@ -1,3 +1,5 @@
+# *-* coding: utf-8 *-*
+
 # este grupo e' para chamar modulos que estao na pasta 'bot'
 import sys
 import os
