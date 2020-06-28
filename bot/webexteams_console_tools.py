@@ -1,4 +1,6 @@
-﻿from webexteams import getwebexRoomID, getwebexUserID, CleanUpWebhook, DeleteWebhook, CriaWebhook, WebexIncUser, webexmsgRoom, webexRoomsList, WebexRoomDel
+﻿# -*- coding: utf-8 -*-
+
+from webexteams import getwebexRoomID, getwebexUserID, CleanUpWebhook, DeleteWebhook, CriaWebhook, WebexIncUser, webexmsgRoom, webexRoomsList, WebexRoomDel
 
 def webexconsole(box):
 

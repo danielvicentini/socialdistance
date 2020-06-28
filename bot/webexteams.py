@@ -1,21 +1,29 @@
-﻿from webexteamssdk import WebexTeamsAPI
-from config import *
+﻿# -*- coding: utf-8 -*-
+
+##########################################################
+# Webexteams functions from webexteamssdk
+
+from webexteamssdk import WebexTeamsAPI
+from config import bottoken
 
 #########################################################
-## VAR FIXAS
+## FIXED VARS
 
 
 api = WebexTeamsAPI(access_token=bottoken)
 
 
 #########################################################
-## FUNCOES WEBEX TEAMS
+## WEBEX TEAMS FUNCTIONS
 
 #########################################################
-## Sessão webhook
+## Webhooks functions
 
 def ValidaWebhook(webhook_name,webhook_url):
 
+    # validates and creates webhook if necessary
+
+    # Portuguese:
 	# Valida existencia de webhook, na ausencia cria novo
     # Retorna sucesso ou erro na operacao
 
@@ -34,6 +42,7 @@ def ValidaWebhook(webhook_name,webhook_url):
 
 def CriaWebhook(webhook_name,webhook_url):
 
+    # Create Webhook
 
 	# Cria Webhook para receber msg via POST
 	# Avisa Teams para gerar hooks para mensagems criadas somente
@@ -53,6 +62,9 @@ def CriaWebhook(webhook_name,webhook_url):
     return resultado
 
 def CleanUpWebhook():
+
+    # Show all active webhooks
+    # delete all inactive webhooks
 
     # cleaning de webhooks
 	# lista webhooks, e apaga os desativados
@@ -82,6 +94,8 @@ def CleanUpWebhook():
 
 def DeleteWebhook(webhook):    
         
+    # Delete a webhook     
+
     # apaga todos os webhooks com <nome> caso nome seja informado
     # retorna o resultado
 
@@ -106,9 +120,12 @@ def DeleteWebhook(webhook):
 
 
 #########################################################
-# Sessao sobre pessoas
+# People Session
 
 def webexME():
+
+    # details about myself
+
 	# detalhes sobre mim, retorna dados
 	data = api.people.me()
 
@@ -116,6 +133,9 @@ def webexME():
 
 def getwebexUserID(mail):
 	
+
+    # Returns userid from email
+
     # pesquisa ID do usuário e retorna; retorna vazio se nao encontrado
 	
     try:
@@ -132,9 +152,11 @@ def getwebexUserID(mail):
 
 
 #########################################################
-# Sessao sobre Salas
+# Rooms Session
 
 def WebexRoomCreate(name):
+
+    # Create a new room by name
 
 	# Cria Sala Webex,name aqui e' o nome da Sala, e retorna o ID da sala. Vazio se erro.
 
@@ -150,6 +172,8 @@ def WebexRoomCreate(name):
 
 def WebexRoomDel(id):
 
+    # Delete a room by roomid
+
     resultado=""
 	#Remove sala Webex,id aqui e' roomID, retorna sucesso ou nao
     try:
@@ -162,6 +186,9 @@ def WebexRoomDel(id):
     return resultado
 
 def WebexIncUser(sala,mail):
+
+    # Includes a user by usermail to a room by name
+    # If room does not exist, creates it
 
     msg=""
 	# Inclui usuario como membro da sala, criando sala caso nao exista
@@ -199,6 +226,9 @@ def WebexIncUser(sala,mail):
     return msg
 
 def webexRoomsList():
+
+    # returns list of rooms I belong to
+
 	# lista salas que pertenco, retorna msg com a lista
  
     rooms=api.rooms.list()
@@ -214,6 +244,8 @@ def webexRoomsList():
 
 
 def getwebexRoomID(sala):
+
+    # Returns roomid given by room name
 
 	# Retorna ID da Sala; retorna vazio se nao encontrado
    	# O parametro sala e' todo ou parte do nome da sala procurada
@@ -244,10 +276,12 @@ def getwebexRoomID(sala):
 
 
 #########################################################
-# Sessao sobre envio de mensagens
+# Message session
 
 def getwebexMsg(msgID):
 	
+    # Return msg contents by msgid
+
 	# msgID é o parametro resgatado do corpo do webhook
 	# Retorna lista com o [0]texto da mensagem informada [1]ID da sala e [2]email da pessoa
 	mensagem=api.messages.get(msgID)
@@ -256,6 +290,8 @@ def getwebexMsg(msgID):
 
 
 def webexmsgUser(user,msg):
+
+    # Sent a 1:1 message
 
     # Manda 1 msg para 1 user específico baseado no email informado
     # caso não consiga, retorna erro
@@ -270,14 +306,16 @@ def webexmsgUser(user,msg):
         resultado="erro"
     pass
 
-
+    return resultado
 
 def webexmsgRoom(sala,msg):
+
+    # Sent message to a room by room name
 
 	# Manda msg para 1 sala especifica, procurando salas onde estou (usando partes do nome informado em sala).
     # Retorna sucesso ou erro
 
-    rooms=api.rooms.list()
+    # rooms=api.rooms.list()
     salawebex = None
 
     #resgata ID da sala
@@ -296,6 +334,7 @@ def webexmsgRoom(sala,msg):
 
 def webexmsgRoomviaID(sala,msg,arquivo):
 
+    # Send message + file (optinal) by room name
 
 	# Manda msg para 1 sala especifica informada via sala=roomID,  retorna sucesso ou erro
     # 21.11.19 - caso tenha arquivo na mensagem, vai inclui-lo

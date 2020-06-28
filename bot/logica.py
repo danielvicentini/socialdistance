@@ -1,9 +1,20 @@
-﻿from config_shared import *
+﻿# -*- coding: utf-8 -*-
+
+# This code was originaly Documented in Portuguese Language
+# Daniel 6.26.2020
+
+# Webex Teams rooms from config_shared
+from config_shared import admins_room
+# Bot config
 from config import memoria, botmail, webhook_name, configuracao, configa
+
+# Webex functions
 from webexteams import getwebexMsg, webexmsgRoomviaID, getwebexRoomID, getwebexUserID, webexmsgUser
 import json
 
 # ver 1.5 - 11.5.20
+
+# Functions
 
 #### FUNÇÕES A RESPEITO DAS OPÇÕES/COMANDOS DISPONÍVEIS AO USUÁRIO
 #####################################################################
@@ -11,20 +22,25 @@ import json
 # Funcão para retornar menu com opções ao usuário
 # Estas funções são chamadas dentro da logica
 
+# Reads and presentes options to the user (from comando such as 'Help')
+
 def opcoes_para_user():
     
     # acessa cada uma das opcoes da configuracao de opcoes
     # para apresentar a lista de comandos disposniveis ao user
-    msg="***Comandos disponiveis que posso fazer***:  \n\n"
+    msg="***Commands that I understand***:  \n\n"
     c=0
     for b in novas_opcoes['opcoes']:
         msg=msg+"***"+str(c+1)+") "+novas_opcoes['opcoes'][c]['title']+"***  \n"
         msg=msg+novas_opcoes['opcoes'][c]['desc']+"  \n"
         c+=1
     
-    msg=msg+"  \nDigite partes do comando para começarmos nossa conversa.  \n"
+    msg=msg+"  \nType keywords so we can start our chat.  \n"
 
     return msg
+
+
+# This function returns data from an specific user option
 
 # Função que retorna dados a respeito de cada opção
 # Ex: se requer parametros, quais as tags
@@ -44,6 +60,8 @@ def optparam(codigo,item):
         c+=1
 
     return dado
+
+# This function try to understand the best match for an available option for the user based on keywords sent.
 
 # Função que sugere melhor comando de acordo com o entendimento do usuário
 # Entendimento é feito comparando o que o usuário escreveu com o valor da "tag" da opção    
@@ -95,6 +113,8 @@ def sugere_opcao(comando):
         return 0
 
 
+# Initiates memory for a user - used by the robot to chat with the user
+
 # Função que inicia valores para um usuário conversando com o robo
 # iniciar valores = convesarsa começando do zero.
 
@@ -115,9 +135,14 @@ def reinicia_user(usermail):
     except:
         pass
 
+### Main Code
+
 
 #### PROGRAMA PRINCIPAL
 
+
+### Step 0 - Ready options available from options.json
+#################################################################
 
 # 0) Inicio
 # leitura do arquivo de opcoes
@@ -138,6 +163,12 @@ try:
     
 except:
     print ("erro na leitura do arquivo de opçoes")
+
+
+
+### Part 1 - Logic - main function - this function is called whenever a text arrives for the bot
+#################################################################
+
 
 # 1) logica
 # É chamado a medida que um comando chega do usuário, seja via console (testes) ou via http (produção)
@@ -186,6 +217,12 @@ def logica(comando,usermail):
         # protanto variaveis serao criadas
         reinicia_user(usermail)
         aguardando=memoria[usermail]['wait']
+
+
+        
+    ### Part 2 - Start decision tree
+    #################################################################
+
         
     # 2) Análise
     # Caso esteja no começa da conversa, este bloco entende o que o usuário quer fazer
@@ -194,7 +231,7 @@ def logica(comando,usermail):
     if aguardando==False:
         
         # 2.1a. teste se user pediu ajuda
-        if "ajuda" in comando:
+        if "help" in comando or "ajuda" in comando:
             # roda as opcaoes disponives
             msg=opcoes_para_user()
                 
@@ -216,14 +253,24 @@ def logica(comando,usermail):
                     # Se o comando requer parametros, entao o prox passo é a logica de entrada de parametros
                     memoria[usermail]['params']=False
 
-                msg="Você quiz dizer: "+str(optparam(opescolhido,"title"))+" ?  \n"
+                # Portuguese
+                msg=f"Você quiz dizer: {optparam(opescolhido,'title')} ?  \n"
+                # English
+                msg=f"Do you mean: {optparam(opescolhido,'title')} ?  \n"
 
                 # Se chegou até aqui... na próxima interação robo fica a espera da continuidade da conversa
  
         # 2.1c nada conhecido, então devolve msg padrão
 
         if msg=="":
+            # Portuguese
             msg="Olá. Digite ***ajuda*** para ver as opçoes disponíveis.  \nVou tentar adivinhar também o que você está procurando :-)  \n"
+            # English
+            msg="Hello. Type ***help*** to see available options.  \nI'll try to guess what you are looking for :-)  \n"
+
+   # Part 3
+   # Robot expects information from user
+   #################################################
 
     # 3) Conversando
     # Caso conversa já iniciado, usa este bloco
@@ -235,9 +282,37 @@ def logica(comando,usermail):
         codigo=memoria[usermail]['option']
     
         # Textos padrão
-        msg_titulo="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
-        msg_sn="Diga ***sim*** ou ***ok*** para continuar ou digite ***não*** ou ***reinicie*** para recomeçarmos.  \n"   
-        msg_ready="Estou pronto para executar seu comando.  \n"
+        # Portuguese
+        #msg_titulo="Bem? Eu tinha entendido: ***"+optparam(memoria[usermail]['option'],'title')+"***.  \n"
+        # English
+        msg_titulo=f"I understood ***{optparam(memoria[usermail]['option'],'title')}***.  \n"
+
+        # Portuguese
+        #msg_sn="Diga ***sim*** ou ***ok*** para continuar ou digite ***não*** ou ***reinicie*** para recomeçarmos.  \n"   
+        # English
+        msg_sn="Type ***yes*** or ***ok*** to continue. Type ***no*** or ***restart*** to restart conversation.   \n"
+        # Portuguese
+        #msg_ready="Estou pronto para executar seu comando.  \n"
+        # English
+        msg_ready="I'm ready to execute you command.  \n"
+        # Portuguese
+        #msg_comma="Digite os parametros separados por virgulas. Você pode reiniciar digitando ***reinicie*** ou ***não***.  \n"
+        # English
+        msg_comma="Type your parameters separated by commas. You can also restart chat by typing ***restart*** or ***no***.  \n"
+
+        # Portuguese
+        #msg_restart = "Ok, vou reiniciar nossa conversa.  \nDigite ***ajuda*** se quiser saber mais o que posso fazer."
+        # English
+        msg_restart = "Ok, I'll restart our chat.  \nType ****help*** if you want to know what I can do."
+
+        # texto para
+        # parametros necessários, caso precise
+        if memoria[usermail]['req']==True:
+            # Portuguese
+            msg_need_params=f"Digite os parametros para completar o comando:{optparam(memoria[usermail]['option'],'params')}  \n"    
+            # English
+            msg_need_params=f"The following parameters are needed:{optparam(memoria[usermail]['option'],'params')}  \n"   
+
 
         # Se chegou até aqui, robo aguarda sim ou não para executar o comando
         if memoria[usermail]['params']==True:
@@ -246,10 +321,15 @@ def logica(comando,usermail):
             if memoria[usermail]['req']==True:
                 parametros=memoria[usermail]['typed']
                 msg_params="Voce digitou os parâmetros : ("+parametros+")  \n"
-             
-            if "sim" in comando or 'ok' in comando:
+                # English
+                msg_params=f"You typed: {parametros}  \n"
+                          
+            if "yes" in comando or 'ok' in comando or "sim" in comando:
             # se chegou aqui no Sim, vai executar se achar funcões para o código desejado
                 msg="vou executar o que você me pediu:  \n"
+                # English
+                msg="Executing what you asked me:  \n  \n"
+
 
                
                 # Os parametros digitados estao na variavel do tipo lista abaixo
@@ -261,69 +341,22 @@ def logica(comando,usermail):
                 # lista_parametros = lista com os parametros digitados pelo usuario, separado por virgulas
                 # o resultado do seu código deve ser atribuido a variavel msg
 
-                if codigo==11:
-                    pin=lista_parametros[0]
-                    # funcao inventario
-                    if pin==configa['PIN']:
-                        msg=msg+"Executando a aplicacão da config..."
-                    else:
-                        msg="PIN não autorizado."
                                             
-                elif codigo==12:
-                    distancia=lista_parametros[0]
-                    # funcao configura distancia
-                    msg=msg+"Executando a config da distancia... para "+str(distancia)
-                    configa['data']['max']=int(distancia)
-                             
-                elif codigo==13:
-                    intervalo=lista_parametros[0]
-                    # funcao configura intervalo
-                    msg=msg+"Executando a config do intervalo... para "+str(intervalo)
-                    configa['data']['interval']=int(intervalo)
+                if codigo==12:
+
+                    #teste admin
+                    if usermail not in configa['admin']:
+                        msg = msg+"I can't execute. You are not an admin.  \n"
+                        msg = msg+msg_restart
+                        reinicia_user(usermail)
+                    else:    
+                        # funcao configura distancia Teste
+                        maximo=lista_parametros[0].strip()
+                        sala=lista_parametros[1].strip()
+                        msg=msg+f"Defining max distance of ***{maximo}*** peopleo for room ***{sala}***...ok"
+                        configa['data']['max']=int(maximo)
                     
-                elif codigo==14:
-                    parametro = lista_parametros[0]
-                    msg=msg+"Executando a monitoria de qtde de pessoas para... "
-                    if 'ok' in parametro or 'on' in parametro or 'sim' in parametro:
-                        # Ativa monitoria qtde pessoas
-                        msg=msg+parametro
-                        configa['data']['distance']=True
-                    elif 'off' in parametro:
-                        # Desativa monitoria qtde pessoas
-                        msg=msg+parametro
-                        configa['data']['distance']=False
-                    else:
-                        msg=msg+"Parametro nao compreendido. Não fiz nada."
-                
-                elif codigo==15:
-                    parametro = lista_parametros[0]
-                    msg=msg+"Executando a monitoria de mascara para... "
-                    if 'ok' in parametro or 'on' in parametro or 'sim' in parametro:
-                        # Ativa monitoria de Mascara
-                        msg=msg+parametro
-                        configa['data']['mask']=True
-                    elif 'off' in parametro:
-                        # Desativa monitoria de Mascara
-                        msg=msg+parametro
-                        configa['data']['mask']=False
-                    else:
-                        msg="Parametro nao compreendido. Não fiz nada."
-
-                elif codigo==16:
-                    parametro = lista_parametros[0]
-                    msg=msg+"Executando o rastreio de pessoas para... "
-                    if 'ok' in parametro or 'on' in parametro or 'sim' in parametro:
-                        # Ativa tracing
-                        msg=msg+parametro
-                        configa['data']['tracing']=True
-                    elif 'off' in parametro:
-                        # Desativa tracing
-                        msg=msg+parametro
-                        configa['data']['tracing']=False
-                        print (configa['data']['tracing'])
-                    else:
-                        msg="Parametro nao compreendido. Não fiz nada."
-
+             
 
                 elif codigo==51:
                     # funcao inventario
@@ -338,17 +371,45 @@ def logica(comando,usermail):
                     msg=msg+saida
 
                     
-                elif codigo==52:
+                elif codigo==55:
                     # config rodando
                     admins=configa['admin']
-                    max=configa['data']['max']
-                    interval=configa['data']['interval']
-                    mask=configa['data']['mask']
-                    distance=configa['data']['distance']
-                    tracing=configa['data']['tracing']
-                    msg=f"Admins: {admins}  \n Monitorando a Distancia: {distance}  \n Max Pessoas: {max}  \n Intervalo de Pesquisa: {interval}  \n Detectar Mascara:{mask}  \n Detectar Tracing:{tracing}  \n"
+                    maximo=configa['data']['max']
+                    msg=msg+f"Current config: Admins: {admins}  \n Max People per room: {maximo}  \n"
                     
                     
+                elif codigo==52:
+                    # Tracing
+                    pessoa=lista_parametros[0]
+                    msg=msg+f"Tracing ***{pessoa}***:  \nList of close people in the previous weeks:  \n"
+                    msg=msg+f"Week 1: ana, daniel, andrey, adilson  \n"
+                    msg=msg+f"Week 2: Ana, Danie, Flávio  \n"
+                    
+                          
+                elif codigo==53:
+                    # Best Day
+                    msg=msg+f"Best days to go to office:  \n"
+                    msg=msg+f"Thursday: ***8h00-9h00***, ***16h00-17h00***  \n"
+                    msg=msg+f"Friday: ***8h00-10h00***  \n"
+
+                elif codigo==54:
+                    # Mask Detection
+                    msg=msg+f"Report of people not wearing mask this week:  \n"
+                    msg=msg+f"Monday: 1  \n"
+                    msg=msg+f"Tuesday: 15  \n"
+                    msg=msg+f"Wednesday: 3  \n"
+                    msg=msg+f"Thursday: 0  \n"
+                    msg=msg+f"Friday: 7  \n"
+                    
+
+
+                elif codigo==55:
+                    # config rodando
+                    admins=configa['admin']
+                    maximo=configa['data']['max']
+                    msg=msg+f"Current config: Admins: {admins}  \n Max People per room: {maximo}  \n"
+                    
+                        
 
                 elif codigo==31:
                     # funcao historico
@@ -375,9 +436,14 @@ def logica(comando,usermail):
 
                 else:
                     msg="Não encontrei um forma de executar o comando que você me pediu devido a um erro na minha programação.  \n"
+                    # English
+                    msg="I couldn't find a way to execute what you asked me due to a failure in my code.  \n"
 
+                # Portuguese
+                #msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
+                #English
+                msg=msg+"  \nI hope you've got what you asked.  \n"
 
-                msg=msg+"  \nEspero ter atendido sua expectativa.  \n"
                 # uma vez que serviço entregue, zera a memória da conversa
                 reinicia_user(usermail) 
 
@@ -396,6 +462,8 @@ def logica(comando,usermail):
         elif memoria[usermail]['params']==False:
             
             if memoria[usermail]['typing']==True:
+
+
                 # fica neste modo a espera dos parametros
                 # quando qtde de comandos está ok, define que qtde de parametros esta correta
                                     
@@ -418,32 +486,32 @@ def logica(comando,usermail):
                         c+=1
                     # Se chegou até aqui, avisa agora que falta só o sim
                     msg=msg_titulo
-                    msg=msg+"Parametros digitados: "+texto+ "  \n"
+                    msg=msg+f"You typed: {texto}  \n"
                     msg=msg+msg_sn
                     memoria[usermail]['params']=True
                 else:
-                    # informa que ainda falta qtde de parametros
-                    msg_param="Estou aguardando parametros do seu lado.   \nEles sao: ***" + optparam(memoria[usermail]['option'],"params")+"***  \n"
-                    msg_type="Digite os parametros separados por virgulas.  \n"
-                    msg=msg_titulo+msg_param+msg_type+msg_sn
+                    msg=msg_titulo+msg_need_params+msg_comma
 
 
                # se chegou aqui, aguarda user dizer se é o comando inicialmente está correto ou não
             else:
-                if 'sim' in comando or 'ok' in comando:
-                    msg= "Ok. Digite os parametros para completar o comando:"+(optparam(memoria[usermail]['option'],"params"))
-                    msg= msg+"  \nLembre-se de separar os comandos por vírgulas.  \n"
+
+                if 'yes' in comando or 'ok' in comando or 'sim' in comando:
+                    msg=msg_need_params
+                    msg=msg+msg_comma
                     memoria[usermail]['typing']=True
                     # sendo sim, significa agora que está a espera de parametros
                 else:
-                    msg=msg_titulo+"Estou aguardando que você responda ***sim*** ou ***ok***. Na dúvida digite ***não*** ou ****reinicie***.  \n"    
+                    msg=msg_titulo+msg_sn
 
+        # 4 - User cancelled conversation
+        ##############################################
 
         # 4)  Usuário cancelou a conversa  então este bloco recomeça
 
         # Reinicia conversa se usuario pedir
-        if 'reinicie' in comando or "não" in comando or "nao" in comando:
-            msg = "Ok, vou reiniciar nossa conversa.  \nDigite ***ajuda*** se quiser saber mais o que posso fazer."
+        if 'restart' in comando or "no" in comando or "não" in comando or "reinicia" in comando:
+            msg=msg_restart
             reinicia_user(usermail)
 
     # comandos de teste
@@ -469,8 +537,18 @@ def logica(comando,usermail):
 
 def trataPOST(content):
 
+
+    # HTTP POST Functions
+
+    # Deals with POST
+    # Webhook from user or
+    # Alarms generated by other modules
+
     # webhooks aqui
    
+    # Webex Webhooks
+    ######
+
     try:
         # resposta as perguntas via webexteams
         # trata mensagem quando nao e' gerada pelo bot. Se nao e' bot, entao usuario     
@@ -494,8 +572,11 @@ def trataPOST(content):
 
     
     except:
-        print ("não é webhook")
+        print ("não é webhook esperado")
 
+
+    # Alarms sent via POST
+    ###############################
 
     # alarmes aqui
 
@@ -517,16 +598,24 @@ def trataPOST(content):
             imagem=""
 
             # texto que veio do alarme
-            txt_alarm=content['data']['message']
+            try:
+                txt_alarm=content['data']['message']
+            except:
+                print ("nenhuma mensagem identificada")
             
             # lista de pessoas (emails) separados por virgulas
-            pessoas=list(content['data']['who'].split(','))
+            try:
+                pessoas=list(content['data']['who'].split(','))
+            except:
+                print ('Nenhum destinatario identificado')
+                pessoas=()
             
             # tenta identificar imagem (opcional)
             try:
                 imagem=content['data']['image']
             except:
                 print ('Imagem não identificada')
+                imagem="None"
             
 
             # tipo de alarme
@@ -538,18 +627,26 @@ def trataPOST(content):
             if tipo_alarme=="00":
                 # Alarme para individuos
                 # pessoas pode conter um email ou uma lista de emails 
-                for b in pessoas:
-                    webexmsgUser(b,txt_alarm)
+                
+                try:
+                    for b in pessoas:
+                        webexmsgUser(b,txt_alarm)
+                except:
+                    print ("Envio individual falhou")
                     
+
             elif tipo_alarme=="01":
                 # Alarme do tipo aviso para admin
                 # Envia nota para Sala dos Admins/Facility manager
-                sala=getwebexRoomID(admins_room)
-                webexmsgRoomviaID(sala,txt_alarm,imagem)
+                try:
+                    sala=getwebexRoomID(admins_room)
+                    webexmsgRoomviaID(sala,txt_alarm,imagem)
+                except:
+                    print("Falha para enviar msg ao grupo admin")
             else:
                 print ('Nenhum cod de alarme conhecido')
 
     except:
-        print ("não é alarme.")
+        print ("não é alarme esperado")
 
 
