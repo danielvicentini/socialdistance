@@ -1,70 +1,46 @@
 {	"opcoes": [{
-		"tag": "aplicar setup",
-		"title": "Aplicar as configurações feitas",
-		"desc": "Esta opção vai aplicar as configuracoes que vc alterou.",
-		"option": 11,
-		"req": true,
-		"params":"PIN"
-	}, {
-		"tag": "configurar distancia sala",
-		"title": "Configurar distanciamento na Sala",
-		"desc": "Esta opção vai definir a regra de distanciamento de pessoas.  \nO numero que vc informar para um determinada sala  \nserá o critério aplicado.",
+		"tag": "configure room distanc",
+		"title": "Configure room distancing",
+		"desc": "Define max users for people distancing control.",
 		"option": 12,
 		"req": true,
-		"params": "No. de pessoas por sala"
+		"params": "Quantity of Max people per room,Room name"
 	}, {
-		"tag": "configurar intervalo rastreio",
-		"title": "Configurar intervalo de rastreio",
-		"desc": "Esta opção vai definir o periodo que os dados serão coletados.",
-		"option": 13,
-		"req": true,
-		"params": "tempo (em minutos)"
-	}, {
-		"tag": "ativar distanciamento",
-		"title": "Ativar monitoria de distanciamento",
-		"desc": "Esta opção ativa a monitoria de distanciamento.",
-		"option": 14,
-		"req": true,
-		"params": "on or off"
-	}, {
-		"tag": "ativar deteccao mascara",
-		"title": "Ativar detecçao de pessoas sem máscara",
-		"desc": "Esta opção ativa a análise de presença de pessoas sem máscara.",
-		"option": 15,
-		"req": true,
-		"params": "on or off"
-	}, {
-		"tag": "ativar rastreio pessoas",
-		"title": "Ativar Rastreamento das pessoas",
-		"desc": "Esta opção ativa a análise da movimentacao de pessoas nas salas.",
-		"option": 16,
-		"req": true,
-		"params": "on or off"
-				
-	}, {
-		"tag": "historico uso",
-		"title": "Mostrar o historico de uso",
-		"desc": "Esta opção vai informar como esta a política de distaciamento para vc entender se ela está sendo utilizada.",
+		"tag": "historic use",
+		"title": "Report historic of distancing",
+		"desc": "Show report distancing in the rooms.",
 		"option": 31,
 		"req": false
 	}, {
-		"tag": "inventario invent",
-		"title": "Mostrar o inventario",
-		"desc": "Esta opção vai mostrar o inventario de equipamentos técnicos sendo usados.",
+		"tag": "inventory invent",
+		"title": "Show inventory",
+		"desc": "Show covered inventory for distacing.",
 		"option": 51,
 		"req": false
 	}, {
-		"tag": "configura configuracao rodando",
-		"title": "Mostrar configuração rodando.",
-		"desc": "Mostra as configurações ativas",
+		"tag": "trace tracing",
+		"title": "Report tracing",
+		"desc": "Show people that worked closely to a subject.",
 		"option": 52,
-		"req": false
+		"req": true,
+		"params": "Person id of subject"
 	}, {
-		"tag": "configura configuracao salva",
-		"title": "Mostrar configuração salva.",
-		"desc": "Mostra as configurações salvas",
+		"tag": "best day office",
+		"title": "Report best days to go to office",
+		"desc": "Show days with the lowest know presence at the office.",
 		"option": 53,
 		"req": false
-		
+	}, {
+		"tag": "mask detect",
+		"title": "Report of Mask Detection compliance",
+		"desc": "Show report of people detected without security mask.",
+		"option": 54,
+		"req": false
+	}, {
+		"tag": "show config configuration run",
+		"title": "Show running config",
+		"desc": "Show active configurations.",
+		"option": 55,
+		"req": false
 	}]
 }
