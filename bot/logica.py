@@ -7,10 +7,12 @@
 from config_shared import admins_room
 # Bot config
 from config import memoria, botmail, webhook_name, configuracao, configa
+from config_shared import report_server, report_server_port
 
 # Webex functions
 from webexteams import getwebexMsg, webexmsgRoomviaID, getwebexRoomID, getwebexUserID, webexmsgUser
 import json
+import requests
 
 # ver 1.5 - 11.5.20
 
@@ -384,6 +386,13 @@ def logica(comando,usermail):
                     msg=msg+f"Tracing ***{pessoa}***:  \nList of close people in the previous weeks:  \n"
                     msg=msg+f"Week 1: ana, daniel, andrey, adilson  \n"
                     msg=msg+f"Week 2: Ana, Danie, Flávio  \n"
+
+                    # Teste de código para consultar report
+                    url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/ana"
+                    headers = {'Content-Type': "application/json" }
+                    response = requests.request("GET", url, headers=headers)
+                    msg=msg+response.text
+
                     
                           
                 elif codigo==53:
@@ -401,6 +410,12 @@ def logica(comando,usermail):
                     msg=msg+f"Thursday: 0  \n"
                     msg=msg+f"Friday: 7  \n"
                     
+                    
+                    # Teste de código para consultar report
+                    url = f"http://{report_server}:{report_server_port}/api/v1/consulta/sanityMask/1"
+                    headers = {'Content-Type': "application/json" }
+                    response = requests.request("GET", url, headers=headers)
+                    msg=msg+response.text
 
 
                 elif codigo==55:
@@ -418,6 +433,12 @@ def logica(comando,usermail):
                     msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
 
                 
+                    # Teste de código para consultar report
+                    url = f"http://{report_server}:{report_server_port}/api/v1/consulta/totalcount/hoje"
+                    headers = {'Content-Type': "application/json" }
+                    response = requests.request("GET", url, headers=headers)
+                    msg=msg+response.text
+
                 
 
 
