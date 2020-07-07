@@ -93,9 +93,9 @@ class DBClient():
       #Return True to indicate that data was recorded
       return True
 
-  def SanityMask(self, local: str, qtde: int):
+  def SanityMask(self, local: str, network:str, serial:str, url:str, time:str):
       """
-      Escreve no banco eventos quando pessoas sem mascara (qtde é pessoas sem máscara naquele momento)
+      Escreve no banco eventos quando pessoas sem máscara
       """
      
       # Prepare JSON with data to be writte in PeopleCount measurement
@@ -103,8 +103,12 @@ class DBClient():
       json_body["measurement"] = TABELA_MV
       json_body["tags"] = {}
       json_body["tags"]["local"] = local
+      json_body["tags"]["network"] = network
+      json_body["tags"]["serial"] = serial
       json_body["fields"] = {}
-      json_body["fields"]["detected"] = qtde
+      json_body["fields"]["url"] = url
+      json_body["time"]= time
+      
       
       # Write data to InfluxDB
       self._client.write_points([json_body])
@@ -170,7 +174,7 @@ def bd_update(json_content):
 
     # Tipo 1 - raw de entrada e saida de usuario
     # Type 1 - raw data of login/logoff user
-    #Content= {
+    # {
     #    "type":"peoplelog",
     #    "local":"LOG1",
     #    "origem":"python",
@@ -180,7 +184,7 @@ def bd_update(json_content):
 
     # Tipo 2 - Total de pessoas na sala
     # Typo 2 - Total people in a room
-    #Content= {
+    # {
     #    "type":"totalcount",
     #    "local":"SALA_log2",
     #    "total":100
@@ -188,10 +192,13 @@ def bd_update(json_content):
 
     # Tipo 3 - Pessoas detectadas sem mascara
     # Type 3 - No Mask detected people
-    #log3= {
+    # {
     #    "type":"sanitymask",
-    #    "local":"SALA-Log3",
-    #    "detected":100
+    #    "local":"SALA-Log3"
+    #    "network":"XPTO",
+    #    "serial":"XPTO",
+    #    "url":"http://x.com/foto.png"
+    #    "time": "2018-03-28T8:01:00Z"
     #}
 
     # check if it an expected data
@@ -210,7 +217,7 @@ def bd_update(json_content):
             banco.TotalCount(json_content["local"],json_content["total"])
 
         elif tipo == "sanitymask":
-            banco.SanityMask(json_content["local"],json_content["detected"])
+            banco.SanityMask(json_content["local"],json_content['network'],json_content['serial'],json_content['url'],json_content["time"])
 
         # returns ok if ok
         banco.Close()
@@ -220,4 +227,5 @@ def bd_update(json_content):
     except:
         # returns error if not ok
         print ("missing fields or BD error")
+        print (json_content)
         return "erro"
