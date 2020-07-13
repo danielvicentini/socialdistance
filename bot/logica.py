@@ -6,13 +6,19 @@
 # Webex Teams rooms from config_shared
 from config_shared import admins_room
 # Bot config
-from config import memoria, botmail, webhook_name, configuracao, configa
+from config import memoria, botmail, webhook_name, configuracao
 from config_shared import report_server, report_server_port
+from config_shared import mask_server, mask_server_port
+
+# Meraki Devices from Inventory
+from inventory import DeviceInventory, getDeviceInfoName
 
 # Webex functions
 from webexteams import getwebexMsg, webexmsgRoomviaID, getwebexRoomID, getwebexUserID, webexmsgUser
 import json
 import requests
+
+
 
 # ver 1.5 - 11.5.20
 
@@ -126,8 +132,8 @@ def reinicia_user(usermail):
     global memoria
     global configuracao
     # config nova
-    global configa
-
+    # global configa
+    
     # reinicia variavies da memoria par ao usuario
     # robo vai comecar do zero com este usuario
     try:
@@ -180,7 +186,8 @@ def logica(comando,usermail):
     global aguardando
     global memoria
     global configuracao
-    global configa
+    #global configa
+    global DeviceInventory
 
     # faz a logica de entender o comando pedido e a devida resposta para o usuario
     # o parametro usermail e' utilizado para identificar o usuario que solicitou o comando
@@ -347,7 +354,7 @@ def logica(comando,usermail):
                 if codigo==12:
 
                     #teste admin
-                    if usermail not in configa['admin']:
+                    if usermail not in configuracao['admin']:
                         msg = msg+"I can't execute. You are not an admin.  \n"
                         msg = msg+msg_restart
                         reinicia_user(usermail)
@@ -356,27 +363,53 @@ def logica(comando,usermail):
                         maximo=lista_parametros[0].strip()
                         sala=lista_parametros[1].strip()
                         msg=msg+f"Defining max distance of ***{maximo}*** peopleo for room ***{sala}***...ok"
-                        configa['data']['max']=int(maximo)
+                        configuracao['data']['max']=int(maximo)
                     
-             
+                elif codigo==13:
+                    # Start Camera for mask detection
+                    camera=lista_parametros[0]
+                    serial=getDeviceInfoName("SerialNumber",camera)
+                    netid=getDeviceInfoName("NetworkID",camera)
+                    if serial!="erro" or netid!="erro":
+                        msg= (f"Executar: http://{mask_server}:{mask_server_port}/loop?network_id={netid}&mv_serial={serial}&turn=on")
+                    else:
+                        msg = "Couldn't find the device information you asked."
+
+                elif codigo==14:
+                    # Stop camera for mask detection
+                    camera=lista_parametros[0]
+                    serial=getDeviceInfoName("SerialNumber",camera)
+                    netid=getDeviceInfoName("NetworkID",camera)
+                    if serial!="erro" or netid!="erro":
+                        msg= (f"Executar: http://{mask_server}:{mask_server_port}/loop?network_id={netid}&mv_serial={serial}&turn=off")
+                    else:
+                        msg = "Couldn't find the device information you asked."
+
 
                 elif codigo==51:
                     # funcao inventario
-                    c=0
-                    saida = "  \nSegue o inventário:  \n"
-                    for dado in configuracao['inventario']:
-                        sala="Sala:**"+str(dado['sala'])+"**  \n"
-                        ap="Access-Point:"+str(dado['access-point'])+"  \n"
-                        dist="Distancia:"+str(dado['distancia'])+"  \n"
-                        saida=saida+"___  \n"+sala+ap+dist+"___  \n"
-                        c+=1
+                    #c=0
+                    saida = "  \nCurrent Inventory:  \n"
+                    #for dado in configuracao['inventario']:
+                    #    sala="Sala:**"+str(dado['sala'])+"**  \n"
+                    #    ap="Access-Point:"+str(dado['access-point'])+"  \n"
+                    #    dist="Distancia:"+str(dado['distancia'])+"  \n"
+                    #    saida=saida+"___  \n"+sala+ap+dist+"___  \n"
+                    #    c+=1
+                    #c=0
+                    
+                    # Read data from inventory.py
+                    for dado in DeviceInventory:
+                        sala=f"Room: ***{dado['Location']}***  \n"
+                        device=f"Device Name:{dado['Nome']} SN:{dado['SerialNumber']} Type:{dado['Device']}   \nNetId:{dado['NetworkID']}  \n"
+                        saida=saida+sala+device+"___  \n"
                     msg=msg+saida
 
                     
                 elif codigo==55:
                     # config rodando
-                    admins=configa['admin']
-                    maximo=configa['data']['max']
+                    admins=configuracao['admin']
+                    maximo=configuracao['data']['max']
                     msg=msg+f"Current config: Admins: {admins}  \n Max People per room: {maximo}  \n"
                     
                     
@@ -420,8 +453,8 @@ def logica(comando,usermail):
 
                 elif codigo==55:
                     # config rodando
-                    admins=configa['admin']
-                    maximo=configa['data']['max']
+                    admins=configuracao['admin']
+                    maximo=configuracao['data']['max']
                     msg=msg+f"Current config: Admins: {admins}  \n Max People per room: {maximo}  \n"
                     
                         
@@ -622,7 +655,7 @@ def trataPOST(content):
             try:
                 txt_alarm=content['data']['message']
             except:
-                print ("nenhuma mensagem identificada")
+                print ("Nenhuma mensagem identificada")
             
             # lista de pessoas (emails) separados por virgulas
             try:
@@ -648,7 +681,6 @@ def trataPOST(content):
             if tipo_alarme=="00":
                 # Alarme para individuos
                 # pessoas pode conter um email ou uma lista de emails 
-                
                 try:
                     for b in pessoas:
                         webexmsgUser(b,txt_alarm)
@@ -664,6 +696,7 @@ def trataPOST(content):
                     webexmsgRoomviaID(sala,txt_alarm,imagem)
                 except:
                     print("Falha para enviar msg ao grupo admin")
+            
             else:
                 print ('Nenhum cod de alarme conhecido')
 

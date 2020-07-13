@@ -20,6 +20,7 @@ memoria={}
 
 
 # Sample inventory
+"""
 configuracao ={
 	"version": "1",
 	"inventario": [{
@@ -31,12 +32,13 @@ configuracao ={
 			"sala": "Reunião",
 			"access-point": "AP-2",
 			"distancia": 30 }]}
+"""
 
 # nova config 8.6.20
 # admin = list of admins
 # max = max people per rooms
 # 
-configa= {
+configuracao= {
 	"versao": "1",
 	"admin":admins ,
 	"data": {
