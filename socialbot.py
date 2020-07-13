@@ -4,6 +4,8 @@
 import sys
 import os
 sys.path.append(os.path.abspath('bot'))
+sys.path.append(os.path.abspath('DB'))
+
 
 from config import webhook_name, webhook_url
 from webexteams_console_tools import webexconsole
