@@ -3,13 +3,15 @@
 		"title": "Configure room distancing",
 		"desc": "Define max users for people distancing control.",
 		"option": 12,
+		"admin": true,
 		"req": true,
-		"params": "Quantity of Max people per room,Room name"
+		"params": "Room name,Qty of max people per room"
 	}, {
 		"tag": "camera detect start",
 		"title": "Start Camera Detection",
 		"desc": "Turns On camera mask detection",
 		"option": 13,
+		"admin": true,
 		"req": true,
 		"params": "Camera name"
 	}, {
@@ -17,6 +19,7 @@
 		"title": "Stop Camera Detection",
 		"desc": "Turns Off camera mask detection",
 		"option": 14,
+		"admin": true,
 		"req": true,
 		"params": "Camera name"
 	}, {
@@ -24,12 +27,14 @@
 		"title": "Report historic of distancing",
 		"desc": "Show report distancing in the rooms.",
 		"option": 31,
+		"admin": true,
 		"req": false
 	}, {	
 		"tag": "trace tracing",
 		"title": "Report tracing",
 		"desc": "Show people that worked closely to a subject.",
 		"option": 52,
+		"admin": true,
 		"req": true,
 		"params": "Person id of subject"
 	}, {
@@ -37,24 +42,30 @@
 		"title": "Report best days to go to office",
 		"desc": "Show days with the lowest know presence at the office.",
 		"option": 53,
+		"admin": false,
 		"req": false
 	}, {
 		"tag": "report mask",
 		"title": "Report of Mask Detection compliance",
 		"desc": "Show report of people detected without security mask.",
 		"option": 54,
-		"req": false
+		"admin": true,
+		"req": true,
+		"params": "number of days (d) or hours (h)"
+		
 	}, {
 		"tag": "show config configuration run",
 		"title": "Show running config",
 		"desc": "Show active configurations.",
 		"option": 55,
+		"admin": true,
 		"req": false
 	}, {
 		"tag": "inventory invent",
 		"title": "Show inventory",
 		"desc": "Show covered inventory for distacing.",
 		"option": 51,
+		"admin": true,
 		"req": false
 	}]
 }
