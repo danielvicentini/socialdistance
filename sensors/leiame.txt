@@ -1,3 +1,0 @@
-Teste de alertas e dashboard
-
-Gera dados aleatores e envia para freeboard e alertas para teams
