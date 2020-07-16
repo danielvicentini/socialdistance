@@ -1,34 +1,22 @@
 # -*- coding: utf-8 -*-
 ## Variaveis
 
-from influxdb import InfluxDBClient
-import json
-import time
-
-# DB Functions
+import sys
+import os
+sys.path.append(os.path.abspath('..'))
 
 """
 Definition of paramater that allow connecting to the SocialDistance DB
 """
 
-INFLUXDB_HOST = '159.89.238.176'
-INFLUXDB_PORT = 8086
-INFLUXDB_USER = 'root'
-INFLUXDB_PASSWORD = 'root'
-INFLUXDB_DBNAME = 'socialdistance'
-INFLUXDB_DBUSER = 'smly'
-INFLUXDB_DBPASSWORD = 'my_secret_password'
-TABELA_TRACE="TraceDaniel"
-TABELA_MV="MVAndrey"
-TABELA_TOTAL="TotalDaniel"
+from config_shared import INFLUXDB_HOST, INFLUXDB_PORT, INFLUXDB_DBUSER, INFLUXDB_DBPASSWORD, INFLUXDB_DBNAME, INFLUXDB_USER, INFLUXDB_PASSWORD
+from config_shared import TABELA_MV, TABELA_TOTAL, TABELA_TRACE
 
-"""
-Defintion of measurements currently supported at the SocialDistance DB
-General instruction:
-When creating a new measurement to the DB, please add an ALIAS for this measurement and
-refer to it by this alias (instead of the using an string directly).
-"""
+from influxdb import InfluxDBClient
+import json
+import time
 
+# DB Functions
 
 """TimeSeries DataBase Class."""
 
@@ -138,6 +126,36 @@ class DBClient():
       result=self._client.query(query)
       return result
 
+  def ConsultaMask(self, tabela: str, tempo:str):
+      
+      # Consulta deteccao da Mascara nos ultimos 15 dias, 3 dias e ultimo dia
+
+      query= 'SELECT count(url) from ' + tabela
+
+      # Consulta
+      
+      # tenta a consulta, do contrário devolve erro
+      try:
+        consulta=self._client.query(query+" where time > now() - "+tempo)
+
+        
+        # trabalha resultado
+        resultado=list(consulta.get_points())
+        try:
+            x=resultado[0]['count']
+        except:
+            # se chegou aqui, não voltou nenhum resultado, portanto zero.
+            x=0    
+
+        texto = f"{x} events in the past {tempo} time."
+
+      except:
+          texto = "Error in the query. Try XXd (for past days) or XXh (for past hours)."
+
+      json = { "msg":texto}
+      return json
+
+    
 
 
 # BD report
@@ -146,13 +164,21 @@ def bd_consulta(tabela,filtro):
 
     global TABELA_MV, TABELA_TOTAL, TABELA_TRACE
 
+    #open DB
     banco=DBClient()
+
     if tabela=="totalcount":
         tabela=TABELA_TOTAL
     elif tabela=="peoplelog":
         tabela=TABELA_TRACE
     elif tabela=="sanityMask":
         tabela=TABELA_MV
+        x=banco.ConsultaMask(tabela,filtro)
+        banco.Close()
+        return x
+    else:
+        banco.Close()
+        return "tabela nao encontrada"
 
     query=banco.Consulta(tabela,filtro)
     banco.Close()
