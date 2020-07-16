@@ -2,7 +2,7 @@
 # Webex Room for admins
 admins_room="Distanciamento Piloto"
 # Admin list
-admins="flcorrea@cisco.com,dvicenti@cisco.com,maralves@cisco.com,lpavanel@cisco.com,analuciade@cisco.com"
+admins="admin1@domain.com,admin2@admin.com"
 # Webex Bot parameters
 bot_webhook="http://address"
 bot_token="your bot token"
@@ -28,3 +28,15 @@ tt_server_port=9000
 # Grafana Dashboard Address
 grafana_server="localhost"
 grafana_server_port=80
+
+# BD Variables
+INFLUXDB_HOST = db_server
+INFLUXDB_PORT = 8086
+INFLUXDB_USER = '<superuser>'
+INFLUXDB_PASSWORD = '<superpassword'
+INFLUXDB_DBNAME = 'socialdistance'
+INFLUXDB_DBUSER = '<user>'
+INFLUXDB_DBPASSWORD = '<password>'
+TABELA_TRACE="TraceDaniel"
+TABELA_MV="MVAndrey"
+TABELA_TOTAL="TotalDaniel"
