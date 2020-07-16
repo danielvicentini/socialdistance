@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 
+# Social main config file
 # import vars from config_shared 
 # bot info
 # admins info
 
-from config_shared import bot_token, bot_email, bot_webhook, bot_tag, admins
+from config_shared import bot_token, bot_email, bot_webhook, bot_tag
+import json
 
 # DONT TOUCH THIS VARS - THEY'RE GET FROM config_shared.py
 
@@ -18,30 +20,58 @@ webhook_name=bot_tag
 #global vars
 memoria={}
 
+#------------------------------------------------------
+#  Config Room
+#------------------------------------------------------
+# Config agora é criado pelo bot e salva
+# Se ja'existir, recupera
+# 15.7.20
+#padrao= {
+#	"admin":admins ,
+#	"rooms": {
+#		 "<rom name>": <max people> ,
+#		 "<other rooms>": <max peopled>
+#		... : ...
+#	}
+#}
 
-# Sample inventory
-"""
-configuracao ={
-	"version": "1",
-	"inventario": [{
-			"sala": "Cafeteria",
-			"access-point": "AP-1",
-			"distancia": 10
-		},
-		{
-			"sala": "Reunião",
-			"access-point": "AP-2",
-			"distancia": 30 }]}
-"""
+#---------------------------------------------------
+# Bot options
+#---------------------------------------------------
 
-# nova config 8.6.20
-# admin = list of admins
-# max = max people per rooms
-# 
-configuracao= {
-	"versao": "1",
-	"admin":admins ,
-	"data": {
-		"max":30
-	}
-}
+configuracao=dict()
+# carrega  configuracoes, caso tenha
+try:
+    with open('config.json',encoding='utf-8') as json_file:
+	    configuracao=json.load(json_file)  
+except:
+	pass
+
+# Bot options
+# config strcuture
+# { opcoes: [{
+#		"tag": "<list of words to sugest>",
+#		"title": "<option title>",
+#		"desc": "<option description>",
+#		"option": <integer code>,
+#		"admin": <true or false, to be diplayed for admin users>,
+#		"req": <true or false in case command requires parameters>,
+#		"params": "<list of parameters comma separated"}
+# },{ next option } ] }
+
+# opçoes
+# roadmap: 1) Arquivo JSON DONE, 2) GET num site http
+
+# NOTA IMPORTANTE:
+# O Arquivo json precisa ser salvo em UTF-8 e EOL deve ser Unix LF
+# Usar o notepad++ para isto
+# do contrário dará erro na leitura do arquivo no Unix
+
+novas_opcoes=dict()
+# carrega opcoes do arquivo options.json
+try:
+    with open('options.json',encoding='utf-8') as json_file:
+        novas_opcoes=json.load(json_file)
+    
+except:
+    print ("erro na leitura do arquivo de opçoes")

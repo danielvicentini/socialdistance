@@ -4,9 +4,9 @@
 # Daniel 6.26.2020
 
 # Webex Teams rooms from config_shared
-from config_shared import admins_room
+from config_shared import admins_room, admins
 # Bot config
-from config import memoria, botmail, webhook_name, configuracao
+from config import memoria, botmail, webhook_name, configuracao, novas_opcoes
 from config_shared import report_server, report_server_port
 from config_shared import mask_server, mask_server_port
 
@@ -32,18 +32,27 @@ import requests
 
 # Reads and presentes options to the user (from comando such as 'Help')
 
-def opcoes_para_user():
+def opcoes_para_user(usermail):
     
     # acessa cada uma das opcoes da configuracao de opcoes
-    # para apresentar a lista de comandos disposniveis ao user
+    # para apresentar a lista de comandos disponiveis ao user
+    # esta condicionado a apresentar as opcoes se usuario for admin
+
     msg="***Commands that I understand***:  \n\n"
-    c=0
-    for b in novas_opcoes['opcoes']:
-        msg=msg+"***"+str(c+1)+") "+novas_opcoes['opcoes'][c]['title']+"***  \n"
-        msg=msg+novas_opcoes['opcoes'][c]['desc']+"  \n"
-        c+=1
-    
-    msg=msg+"  \nType keywords so we can start our chat.  \n"
+    z=1
+    try:
+        for b in novas_opcoes['opcoes']:
+            if usermail not in admins and b['admin']==True:
+                # pula sessão se usuário não for admin
+                continue
+            else:
+                msg=msg+f"***{z}) {b['title']}***  \n"
+                msg=msg+f"{b['desc']}  \n"
+                z=z+1
+            
+        msg=msg+"  \nType keywords so we can start our chat.  \n"
+    except:
+        msg="No options found.  \n"
 
     return msg
 
@@ -57,15 +66,14 @@ def optparam(codigo,item):
     
     # investiga nas opcoes existentes para o user
     # devolve o valor do item conforme o codigo da opcao
-    c=0
+    
     for b in novas_opcoes['opcoes']:
-        if novas_opcoes['opcoes'][c]['option']==codigo:
+        if b['option']==codigo:
             try:
-                dado=novas_opcoes['opcoes'][c][item]
-                
+                dado=b[item]
             except:
                 dado = "erro"
-        c+=1
+        
 
     return dado
 
@@ -74,52 +82,62 @@ def optparam(codigo,item):
 # Função que sugere melhor comando de acordo com o entendimento do usuário
 # Entendimento é feito comparando o que o usuário escreveu com o valor da "tag" da opção    
 
-def sugere_opcao(comando):
+def sugere_opcao(comando,usermail):
+
+    global admins
 
     # recebe o comando, procura qual a melhor opcao mais proxima a este comando e devolve o código
+    # update: analisa sugestões dependendo do usuário ser normal ou admin
 
     #variável para entencer qual a opcao da lista de comandos qu é mais parecido com o comando digitado
     score=0.0
     # loop para cada um das opções conhecidos
     # variavel c usada para procurar na lista de opcoes
-    c=0
-    for b in novas_opcoes['opcoes']:
-        #
-        txtnow=novas_opcoes['opcoes'][c]['tag'].lower()
-        opcao_cod=novas_opcoes['opcoes'][c]['option']
-        c+=1    
+    
+    try:
+        for b in novas_opcoes['opcoes']:
 
-        #variaveis
-        # qtde de palavras no que foi digitado
-        sp=comando.split(" ")
-        y=len(sp)
-        a=0
-        found=0
-        resultado=0.0
-        
-        # este laço conta a qtde de palavras que o comando digitado tem em comum com a opcao conhecida
-        while a<y:
-            if sp[a] in txtnow:
-                found=found+1
-            a+=1
+            if usermail not in admins and b['admin']==True:
+                # pula sessão se usuário não for admin
+                continue
+            else:
+                #
+                txtnow=b['tag'].lower()
+                opcao_cod=b['option']
+                
+                #variaveis
+                # qtde de palavras no que foi digitado
+                sp=comando.split(" ")
+                y=len(sp)
+                a=0
+                found=0
+                resultado=0.0
+                
+                # este laço conta a qtde de palavras que o comando digitado tem em comum com a opcao conhecida
+                while a<y:
+                    if sp[a] in txtnow:
+                        found=found+1
+                    a+=1
 
-        # calcula o % de aproximacao do comando conhecido    
-        resultado=found/len(txtnow.split(" "))
-        
-        # se tiver a melhor nota, vira provisoriamente a melhor opcao
-        if resultado>score:
-            score=resultado
-            opescolhido=opcao_cod
+                # calcula o % de aproximacao do comando conhecido    
+                resultado=found/len(txtnow.split(" "))
+                
+                # se tiver a melhor nota, vira provisoriamente a melhor opcao
+                if resultado>score:
+                    score=resultado
+                    opescolhido=opcao_cod
+                
+                # Memoriza o comando escolhido como o mais proximo
+                # somente se a nota for igual ou melhor que .3 
+                # do contrario devolve 0 = nenhum
+    except:
+        # error in options
+        pass
 
-       
-    # Memoriza o comando escolhido como o mais proximo
-    # somente se a nota for igual ou melhor que .3 
-    # do contrario devolve 0 = nenhum
     if score>=.3:
         return opescolhido
     else:
         return 0
-
 
 # Initiates memory for a user - used by the robot to chat with the user
 
@@ -129,10 +147,8 @@ def sugere_opcao(comando):
 def reinicia_user(usermail):
     
     global aguardando
-    global memoria
-    global configuracao
-    # config nova
-    # global configa
+    #global memoria
+    #global configuracao
     
     # reinicia variavies da memoria par ao usuario
     # robo vai comecar do zero com este usuario
@@ -142,6 +158,190 @@ def reinicia_user(usermail):
         aguardando=memoria[usermail]['wait']
     except:
         pass
+
+# custom comands function for this bot
+
+def configRoom(sala,maximo):
+
+    # This function will define max user per room.
+    # Also, save the config
+
+    msg = ""
+    # testa se tem config de salas, se nao cria
+    try:
+        
+        configuracao['versao']=int(configuracao['versao'])+1
+        # ok, ja tem e incrementa versao
+    except:
+        #inicializa
+        configuracao['versao']=1
+        configuracao['rooms']={}
+
+    try:
+        configuracao['rooms'][sala]=int(maximo)
+        msg=msg+f"Defining max distance of ***{maximo}*** peopleo for room ***{sala}***."
+                        
+        # gravacao da config
+        arq="config.json"
+        # Salva
+        try:
+            # Salva com LF (Unix like para funcionar no Windows e no Unix (variavel newline))
+            # Salva com encoding UTF-8 para funcionar caracteres especiais no Unix
+            with open(arq, 'w', encoding="utf-8", newline='\n') as file:
+                json.dump(configuracao, file, indent=4, sort_keys=True, ensure_ascii=False)
+
+            msg=msg+"\nConfig saved.  \n"
+        except:
+            msg=msg+"\nError saving config.  \n"
+    except:
+            msg=msg+f"Couldn't define. Chech your parameters."
+        
+    return msg
+
+def showInventory():
+
+    # Show inventory
+    msg=""
+    saida = "  \nCurrent Inventory:  \n"
+                
+    try:
+    # Read data from inventory.py
+        for dado in DeviceInventory:
+            sala=f"Room: {dado['Location']}  \n"
+            device=f"Device Name:***{dado['Nome']}*** SN:{dado['SerialNumber']} Type:{dado['Device']}   \nNetId:{dado['NetworkID']}  \n"
+            saida=saida+sala+device+"___  \n"
+        
+    except:
+        saida="\nNo inventory Found.  \n"
+    
+    msg=msg+saida
+
+    return msg
+
+def showRunning():
+    # config rodando
+    msg=""
+
+    administradores=admins.split(",")
+    msg=msg+f"Current config: ***Admins:***  \n\n"
+    for b in administradores:
+        msg=msg+f"{b}  \n"
+
+    msg=msg+f"Admins Webex room:{admins_room}  \n"
+
+    msg=msg+"\n***Room Distancing configuration:***  \n\n"
+    try:
+        for b in configuracao['rooms']:
+            roomName=b
+            valor=configuracao['rooms'][roomName]
+            msg=msg+f"Room Name ***{roomName}***  Max People: {valor}  \n"
+    except:    
+        msg=msg+"\nNo rooms defined yet.  \n"
+
+    return msg
+
+def reportDistancing():
+
+# funcao historico
+
+    msg=""
+    msg=msg+"  \nO histórico é o seguinte:  \n"
+    msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
+    msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
+
+    try:
+        # Teste de código para consultar report
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/totalcount/hoje"
+        headers = {'Content-Type': "application/json" }
+        response = requests.request("GET", url, headers=headers)
+        msg=msg+response.text
+    except:
+        msg="\nCan't connect to server.  \n"
+
+    return msg
+
+def reportTracing (pessoa):
+
+    # report of people tracing
+
+    msg=""
+    msg=msg+f"Tracing ***{pessoa}***:  \nList of close people in the previous weeks:  \n"
+    msg=msg+f"Week 1: ana, daniel, andrey, adilson  \n"
+    msg=msg+f"Week 2: Ana, Danie, Flávio  \n"
+
+    # Teste de código para consultar report
+    try:
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/ana"
+        headers = {'Content-Type': "application/json" }
+        response = requests.request("GET", url, headers=headers)
+        msg=msg+response.text
+    except:
+        msg="\nCan't connect to server.  \n"
+
+    return msg
+        
+def reportMask(timeframe):
+
+    # Mask Detection
+    msg="Report of people not wearing mask:  \n"
+                            
+    try: 
+        # Chama report server API
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/sanityMask/{timeframe}"
+        headers = {'Content-Type': "application/json" }
+        response = requests.request("GET", url, headers=headers)
+        resposta=json.loads(response.text)
+        msg=msg+f"***{resposta['msg']}***  \n"
+    except:
+        msg="\nCan't connect to server.  \n"
+
+    return msg
+
+def cameraStart(camera):
+
+    # Start camera/Mask Detection
+    
+    msg=""
+    serial=getDeviceInfoName("SerialNumber",camera)
+    netid=getDeviceInfoName("NetworkID",camera)
+    if serial!="erro" or netid!="erro":
+      
+        # chama api
+        try:
+            url = f'http://{mask_server}:{mask_server_port}/loop'
+            params = {"network_id": netid, "mv_serial": serial, "turn":"on" }
+            response = requests.post(url,params=params)
+            msg=msg+f"***{response.text}***  \n"
+        except:
+            msg="\n Can't connect to server.  \n"
+    else:
+        msg = "Couldn't find the device information you asked."
+
+    return msg
+
+
+def cameraStop(camera):
+
+    # Stop camera/Mask Detection
+
+    msg=""
+    serial=getDeviceInfoName("SerialNumber",camera)
+    netid=getDeviceInfoName("NetworkID",camera)
+    if serial!="erro" or netid!="erro":
+      
+        # chama api
+        try:
+            url = f'http://{mask_server}:{mask_server_port}/loop'
+            params = {"network_id": netid, "mv_serial": serial, "turn":"off" }
+            response = requests.post(url, params=params) 
+            msg=msg+f"***{response.text}***  \n"
+        except:
+            msg="\n Can't connect to server.  \n"
+    else:
+        msg = "Couldn't find the device information you asked."
+
+    return msg
+
 
 ### Main Code
 
@@ -155,28 +355,9 @@ def reinicia_user(usermail):
 # 0) Inicio
 # leitura do arquivo de opcoes
 
-# opçoes
-# roadmap: 1) Arquivo JSON DONE, 2) GET num site http
-
-# NOTA IMPORTANTE:
-# O Arquivo json precisa ser salvo em UTF-8 e EOL deve ser Unix LF
-# Usar o notepad++ para isto
-# do contrário dará erro na leitura do arquivo no Unix
-
-novas_opcoes=dict()
-# carrega opcoes do arquivo options.json
-try:
-    with open('options.json',encoding='utf-8') as json_file:
-        novas_opcoes=json.load(json_file)
-    
-except:
-    print ("erro na leitura do arquivo de opçoes")
-
-
 
 ### Part 1 - Logic - main function - this function is called whenever a text arrives for the bot
 #################################################################
-
 
 # 1) logica
 # É chamado a medida que um comando chega do usuário, seja via console (testes) ou via http (produção)
@@ -186,7 +367,6 @@ def logica(comando,usermail):
     global aguardando
     global memoria
     global configuracao
-    #global configa
     global DeviceInventory
 
     # faz a logica de entender o comando pedido e a devida resposta para o usuario
@@ -217,6 +397,7 @@ def logica(comando,usermail):
     # para cada solicitacao do parceiro, esta logica atualiza estas variaveis
 
 
+
     try:
         # recupera o estado da memoria
         aguardando=memoria[usermail]['wait']
@@ -242,14 +423,15 @@ def logica(comando,usermail):
         # 2.1a. teste se user pediu ajuda
         if "help" in comando or "ajuda" in comando:
             # roda as opcaoes disponives
-            msg=opcoes_para_user()
+            # a reposta está condicionado ao user ser admin ou não
+            msg=opcoes_para_user(usermail)
                 
         #2.1b. tenta adivinhar o comando consultando os comandos disponiveis
         # caso ele encontre uma opcao, apresenta e apos isto o robo entra em modo de espera
 
         if msg=="" and len(sp)>0 and len(comando)>=5:
             # chama função que devolve o cod da opcao mais aproximada
-            opescolhido=sugere_opcao(comando)
+            opescolhido=sugere_opcao(comando,usermail)
             if opescolhido != 0:
                 # popula variaveis e pergunta se e' a escolhida
                 memoria[usermail]['option']=opescolhido
@@ -318,9 +500,9 @@ def logica(comando,usermail):
         # parametros necessários, caso precise
         if memoria[usermail]['req']==True:
             # Portuguese
-            msg_need_params=f"Digite os parametros para completar o comando:{optparam(memoria[usermail]['option'],'params')}  \n"    
+            msg_need_params=f"Digite os parametros para completar o comando:***{optparam(memoria[usermail]['option'],'params')}***  \n\n"    
             # English
-            msg_need_params=f"The following parameters are needed:{optparam(memoria[usermail]['option'],'params')}  \n"   
+            msg_need_params=f"The following parameters are needed:***{optparam(memoria[usermail]['option'],'params')}***  \n\n"   
 
 
         # Se chegou até aqui, robo aguarda sim ou não para executar o comando
@@ -338,8 +520,6 @@ def logica(comando,usermail):
                 msg="vou executar o que você me pediu:  \n"
                 # English
                 msg="Executing what you asked me:  \n  \n"
-
-
                
                 # Os parametros digitados estao na variavel do tipo lista abaixo
                 lista_parametros=memoria[usermail]['typed'].split(",")
@@ -352,82 +532,36 @@ def logica(comando,usermail):
 
                                             
                 if codigo==12:
-
-                    #teste admin
-                    if usermail not in configuracao['admin']:
-                        msg = msg+"I can't execute. You are not an admin.  \n"
-                        msg = msg+msg_restart
-                        reinicia_user(usermail)
-                    else:    
-                        # funcao configura distancia Teste
-                        maximo=lista_parametros[0].strip()
-                        sala=lista_parametros[1].strip()
-                        msg=msg+f"Defining max distance of ***{maximo}*** peopleo for room ***{sala}***...ok"
-                        configuracao['data']['max']=int(maximo)
+                    # config rooms
+                    # aplica a nova config e salva
+                    sala=lista_parametros[0].strip()
+                    maximo=lista_parametros[1].strip()
+                    func=configRoom(sala,maximo)
+                    msg=msg+func
                     
                 elif codigo==13:
                     # Start Camera for mask detection
                     camera=lista_parametros[0]
-                    serial=getDeviceInfoName("SerialNumber",camera)
-                    netid=getDeviceInfoName("NetworkID",camera)
-                    if serial!="erro" or netid!="erro":
-                        msg= (f"Executar: http://{mask_server}:{mask_server_port}/loop?network_id={netid}&mv_serial={serial}&turn=on")
-                    else:
-                        msg = "Couldn't find the device information you asked."
+                    func=cameraStart(camera)
+                    msg=msg+func
 
                 elif codigo==14:
                     # Stop camera for mask detection
                     camera=lista_parametros[0]
-                    serial=getDeviceInfoName("SerialNumber",camera)
-                    netid=getDeviceInfoName("NetworkID",camera)
-                    if serial!="erro" or netid!="erro":
-                        msg= (f"Executar: http://{mask_server}:{mask_server_port}/loop?network_id={netid}&mv_serial={serial}&turn=off")
-                    else:
-                        msg = "Couldn't find the device information you asked."
-
+                    func=cameraStart(camera)
+                    msg=msg+func
 
                 elif codigo==51:
-                    # funcao inventario
-                    #c=0
-                    saida = "  \nCurrent Inventory:  \n"
-                    #for dado in configuracao['inventario']:
-                    #    sala="Sala:**"+str(dado['sala'])+"**  \n"
-                    #    ap="Access-Point:"+str(dado['access-point'])+"  \n"
-                    #    dist="Distancia:"+str(dado['distancia'])+"  \n"
-                    #    saida=saida+"___  \n"+sala+ap+dist+"___  \n"
-                    #    c+=1
-                    #c=0
-                    
-                    # Read data from inventory.py
-                    for dado in DeviceInventory:
-                        sala=f"Room: ***{dado['Location']}***  \n"
-                        device=f"Device Name:{dado['Nome']} SN:{dado['SerialNumber']} Type:{dado['Device']}   \nNetId:{dado['NetworkID']}  \n"
-                        saida=saida+sala+device+"___  \n"
-                    msg=msg+saida
-
-                    
-                elif codigo==55:
-                    # config rodando
-                    admins=configuracao['admin']
-                    maximo=configuracao['data']['max']
-                    msg=msg+f"Current config: Admins: {admins}  \n Max People per room: {maximo}  \n"
-                    
-                    
+                    # Calls Inventory function
+                    func=showInventory()
+                    msg=msg+func
+                                    
                 elif codigo==52:
                     # Tracing
                     pessoa=lista_parametros[0]
-                    msg=msg+f"Tracing ***{pessoa}***:  \nList of close people in the previous weeks:  \n"
-                    msg=msg+f"Week 1: ana, daniel, andrey, adilson  \n"
-                    msg=msg+f"Week 2: Ana, Danie, Flávio  \n"
-
-                    # Teste de código para consultar report
-                    url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/ana"
-                    headers = {'Content-Type': "application/json" }
-                    response = requests.request("GET", url, headers=headers)
-                    msg=msg+response.text
-
-                    
-                          
+                    func=reportTracing(pessoa)
+                    msg=msg+func
+                                       
                 elif codigo==53:
                     # Best Day
                     msg=msg+f"Best days to go to office:  \n"
@@ -436,43 +570,18 @@ def logica(comando,usermail):
 
                 elif codigo==54:
                     # Mask Detection
-                    msg=msg+f"Report of people not wearing mask this week:  \n"
-                    msg=msg+f"Monday: 1  \n"
-                    msg=msg+f"Tuesday: 15  \n"
-                    msg=msg+f"Wednesday: 3  \n"
-                    msg=msg+f"Thursday: 0  \n"
-                    msg=msg+f"Friday: 7  \n"
-                    
-                    
-                    # Teste de código para consultar report
-                    url = f"http://{report_server}:{report_server_port}/api/v1/consulta/sanityMask/1"
-                    headers = {'Content-Type': "application/json" }
-                    response = requests.request("GET", url, headers=headers)
-                    msg=msg+response.text
-
-
+                    timeframe=lista_parametros[0]
+                    func=reportMask(timeframe)
+                    msg=msg+func
+                
                 elif codigo==55:
-                    # config rodando
-                    admins=configuracao['admin']
-                    maximo=configuracao['data']['max']
-                    msg=msg+f"Current config: Admins: {admins}  \n Max People per room: {maximo}  \n"
-                    
-                        
+                    func=showRunning()
+                    msg=msg+func
 
                 elif codigo==31:
-                    # funcao historico
-                    msg=msg+"  \nO histórico é o seguinte:  \n"
-                    msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
-                    msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
-
-                
-                    # Teste de código para consultar report
-                    url = f"http://{report_server}:{report_server_port}/api/v1/consulta/totalcount/hoje"
-                    headers = {'Content-Type': "application/json" }
-                    response = requests.request("GET", url, headers=headers)
-                    msg=msg+response.text
-
-                
+                    func=reportDistancing()
+                    msg=msg+func
+                    
 
 
 
@@ -702,5 +811,3 @@ def trataPOST(content):
 
     except:
         print ("não é alarme esperado")
-
-
