@@ -79,6 +79,22 @@ QUERY_MAX_OCCUPANCY = \
          |> yield(name: "history")'
 
 
+QUERY_BEST_DAY = \
+  'import "date" \n\
+   startTime = %s \n\
+   TABELA_TOTAL = "%s" \n\
+                                   \n\
+   t1 = from(bucket:"socialdistance/autogen") \
+         |> range(start: startTime) \
+         |> filter(fn: (r) => (r._measurement == TABELA_TOTAL)) \
+         |> window(every: 1h) |> max() \
+         |> duplicate(column: "_stop", as: "_time") \
+         |> window(every: inf) \
+         |> map(fn: (r) => ({r with hour: uint(v: date.hour(t: r._time)),day: uint(v: date.weekDay(t: r._time))})) \
+         |> drop(columns: ["_start", "_stop", "_measurement", "origin", "_time"]) \
+         |> group(columns: ["location", "hour", "day"]) \
+         |> max() \
+         |> yield(name: "t1")'
 
 
 #---------------------------------------------------------------------------------------
@@ -171,8 +187,48 @@ def OccupancyReport(LocationInventory, startTime):
   for table in tables:
     for record in table.records:
       subdict = {x: record.values[x] for x in ['_time','location', 'count', 'max', 'origin']}
-      if subdict not in result:
-        result.append(subdict)
+      result.append(subdict)
+  return result
+
+
+
+
+#---------------------------------------------------------------------------------------
+# Best day report
+#
+# Input:
+#    startTime = string with initial time for analyzing best day (ex: "2020-07-14T00:00:00Z")
+#
+# Output: List of dictionaty entries with highest occupancy per location/weekday/hour
+#    Dictionary keys:
+#    {
+#     '_value': maximum occupancy 
+#     'day': 0 to 6, indicating week day 
+#     'hour': 0 to 23, indicating hour in the day 
+#     'location': location identification 
+#    }
+#---------------------------------------------------------------------------------------
+def BestDayReport(startTime):
+
+  # Connects to the database
+  url = "http://{}:{}".format(INFLUXDB_HOST, INFLUXDB_PORT)     
+  client = InfluxDBClient(url=url, token="", org="")
+
+  # Build trace query
+  query = QUERY_BEST_DAY % (startTime, TABELA_TOTAL)
+  tables = client.query_api().query(query)
+  csv = client.query_api().query_csv(query)
+  client.__del__()
+
+  # Query result is a list of all tables creted in TRACE_QUERY, each of them of type FluxTable
+  # see https://github.com/influxdata/influxdb-client-python/blob/master/influxdb_client/client/flux_table.py#L5 for more info
+
+  # Build result as a list of all found records in suspecTable
+  result =[]
+  for table in tables:
+    for record in table.records:
+      subdict = {x: record.values[x] for x in ['_value','day', 'hour', 'location']}
+      result.append(subdict)
   return result
 
 
@@ -198,3 +254,8 @@ if __name__ == '__main__':
 
   result2 = OccupancyReport(LocationInventory=LocationInventory, startTime="-1y")
   print (result2)
+
+
+  # Teste do report de best day
+  result3 = BestDayReport (startTime="-1y")
+  print (result3)
