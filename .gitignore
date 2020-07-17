@@ -1,1 +1,5 @@
 venv/
+DB/__pycache__/DB_const.cpython-36.pyc
+QueryFlux-v1
+.vscode/settings.json
+.gitignore
