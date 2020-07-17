@@ -6,81 +6,82 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from influxdb_client import InfluxDBClient
+from influxdb_client import InfluxDBClient, Point
+from influxdb_client.client.write_api import SYNCHRONOUS
 from config_shared import INFLUXDB_HOST, INFLUXDB_PORT, INFLUXDB_DBUSER, INFLUXDB_DBPASSWORD, INFLUXDB_DBNAME, INFLUXDB_USER, INFLUXDB_PASSWORD
 from config_shared import TABELA_MV, TABELA_TOTAL, TABELA_TRACE
+import json
+
 
 ######  MUITO IMPORTANTE: A SER REMOVIDO ##################################
-###### Mudando a balea de Trace para TraceDaniel porque a atual tabela de trace
-###### nao tem nenhum dado
+###### Mudando a tabela de Trace para TraceDaniel porque a atual tabela de trace
+###### nao tem nenhum dado.  O mesmo foi feito para a tabela de count.
 ################################################################################
-
 TABELA_TRACE = "TraceDaniel"
-
-LocationInventory = [
-  {
-   "Location": "Cozinhha",
-   "Occupancy": 1
-   },
-  {
-   "Location": "EDU",
-   "Occupancy": 2
-   },
-  {
-   "Location": "IND",
-   "Occupancy": 2
-   },
-  {
-   "Location": "Quartos",
-   "Occupancy": 2
-   },
-  {
-   "Location": "Sala",
-   "Occupancy": 2
-   },
-  {
-   "Location": "Sandboz",
-   "Occupancy": 3
-   }
-]
-
+TABELA_TOTAL = "RawPeopleCount"
 
 
 QUERY_TRACE = \
-     'targetUser = "%s" \n\
-      startTime = %s \n\
-      stopTime = %s \n\
-      \n\
-      t1 = from(bucket:"socialdistance/autogen") \n\
-            |> range(start: startTime, stop: stopTime) \n\
-            |> filter(fn: (r) => (r._measurement == "%s") and (r._field =~ /(userid)|(state)/)) \n\
-            |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value") \n\
-            |> drop(columns: ["_start", "_stop", "_measurement"]) \
-      \n\
-      t2 = t1 \n\
-            |> filter(fn: (r) => (r.state=="entrou")) \n\
-            |> map(fn: (r) => ({r with entryTime: r._time})) \n\
-      t3 = t1 \n\
-            |> filter(fn: (r) => (r.state=="saiu")) \n\
-      t4 = union(tables: [t2, t3]) \n\
-            |> sort(columns:["userid", "_time"]) \n\
-            |> fill(column:"entryTime", usePrevious: true) \n\
-      \n\
-      t5 = t4 \n\
-            |> filter(fn: (r) => (r.state=="saiu")) \n\
-            |> map(fn: (r) => ({r with exitTime: r._time})) \n\
-            |> drop(columns: ["state", "_time"]) \
-      \n\
-      targetTable = t5 \n\
-                     |> filter(fn: (r) => (r.userid == targetUser)) \n\
-                     |> drop(columns: ["userid"]) \n\
-      othersTable = join(tables: {other: t5, target: targetTable}, on:["local"]) \n\
-                     |> filter (fn: (r) => (r.userid != targetUser)) \n\
-      suspectTable = othersTable \n\
-                       |> filter (fn: (r) => ((r.exitTime_other >= r.entryTime_target) and (r.exitTime_target >= r.entryTime_other))) \n\
-                       |> yield(name: "suspectTable")'
+  'targetUser = "%s" \n\
+   startTime = %s \n\
+   stopTime = %s \n\
+   TABELA_TRACE = "%s"  \n\
+                        \n\
+   t1 = from(bucket:"socialdistance/autogen") \n\
+          |> range(start: startTime, stop: stopTime) \n\
+          |> filter(fn: (r) => (r._measurement == TABELA_TRACE) and (r._field =~ /(userid)|(state)/)) \n\
+          |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value") \n\
+          |> drop(columns: ["_start", "_stop", "_measurement"]) \n\
+                                                                \n\
+   t2 = t1 \n\
+          |> filter(fn: (r) => (r.state=="entrou")) \n\
+          |> map(fn: (r) => ({r with entryTime: r._time})) \n\
+   t3 = t1 \n\
+          |> filter(fn: (r) => (r.state=="saiu")) \n\
+   t4 = union(tables: [t2, t3]) \n\
+          |> sort(columns:["userid", "_time"]) \n\
+          |> fill(column:"entryTime", usePrevious: true) \n\
+                                                         \n\
+   t5 = t4 \n\
+          |> filter(fn: (r) => (r.state=="saiu")) \n\
+          |> map(fn: (r) => ({r with exitTime: r._time})) \n\
+          |> drop(columns: ["state", "_time"]) \
+                                               \n\
+   targetTable = t5 \n\
+                  |> filter(fn: (r) => (r.userid == targetUser)) \n\
+                  |> drop(columns: ["userid"]) \n\
+   othersTable = join(tables: {other: t5, target: targetTable}, on:["local"]) \n\
+                  |> filter (fn: (r) => (r.userid != targetUser)) \n\
+   suspectTable = othersTable \n\
+                    |> filter (fn: (r) => ((r.exitTime_other >= r.entryTime_target) and (r.exitTime_target >= r.entryTime_other))) \n\
+                    |> yield(name: "suspectTable")'
 
-#
+
+
+QUERY_MAX_OCCUPANCY = \
+  'startTime = %s \n\
+   TABELA_TOTAL = "%s"  \n\
+   TABELA_LOCATION = "%s" \n\
+                          \n\
+   t1 = from(bucket:"socialdistance/autogen") \
+         |> range(start: startTime) \
+         |> filter(fn: (r) => (r._measurement == TABELA_TOTAL)) \n\
+                                                                \n\
+   t2 = from(bucket:"socialdistance/autogen") \
+         |> range(start: -1y) \
+         |> filter(fn: (r) => (r._measurement == TABELA_LOCATION)) \
+         |> last() \
+         |> map(fn: (r) => ({location: r.location, max: r._value}))  \n\
+                                                                     \n\
+   history = join(tables: {count: t1, max: t2}, on:["location"]) \
+         |> filter (fn: (r) => (r._value > r.max)) \
+         |> map(fn: (r) => ({_time: r._time, location: r.location, count: r._value, max: r.max, origin: r.origin}))  \
+         |> yield(name: "history")'
+
+
+
+
+#---------------------------------------------------------------------------------------
 # Trace report
 #
 # Input:
@@ -88,12 +89,13 @@ QUERY_TRACE = \
 #    startTime = string with initial time for tracing (ex: "2020-07-14T00:00:00Z")
 #    stopTime = string with final time for tracing (ex: "2020-07-14T00:00:00Z")
 #
-# Output: List of dictionaty entries in the format
+# Output: List of dictionaty entries with users that were in contact with targetUser.
+#    Dictionary keys:
 #    {
-#     'local': <local where user met targetUser>, 
-#     'userid': <id of user that met targerUser>'
+#     'local': <local where user was in contact with targetUser>, 
+#     'userid': <id of user that was in contact with targerUser>'
 #    }
-#
+#---------------------------------------------------------------------------------------
 def TraceReport(targetUser, startTime, stopTime):
 
   # Connects to the database
@@ -119,50 +121,56 @@ def TraceReport(targetUser, startTime, stopTime):
 
 
 
-#
+#---------------------------------------------------------------------------------------
 # Distancing report
 #
 # Input:
-#    startTime = string with initial time for report (ex: "2020-07-14T00:00:00Z")
+#    LocationInventory: Dictionary with location inventory
+#    startTime = string with initial time for report (ex: "-1w")
 #
-# Output: List of dictionaty entries in the format
+# Output: List of dictionaty entries with rooms with higher occupancy than allowed.
+#    Dictionary keys:
 #    {
-#     'local': <local where user met targetUser>, 
-#     'userid': <id of user that met targerUser>'
+#     '_time'   : time that event was detected
+#     'location': room where event occurred
+#     'count'   : number of people detect at this room at this time
+#     'max'     : maximum number allowed in this room
+#     'origin'  : indicates how measurement was made
 #    }
-#
-def OccupancyReport(startTime):
+#---------------------------------------------------------------------------------------
+def OccupancyReport(LocationInventory, startTime):
 
   # Connects to the database
   url = "http://{}:{}".format(INFLUXDB_HOST, INFLUXDB_PORT)     
   client = InfluxDBClient(url=url, token="", org="")
 
   # Preapre to create a table with maximum occupancy per room 
-  TEMP_TABLE = "MaximumOccupancy"
+  TABELA_LOCATION = "LocationInventory"
   write_api = client.write_api(write_options=SYNCHRONOUS)
 
   #Build a record per local
   record = []
-  for location in LocationInventory:
-    _point = Point(TEMP_TABLE).tag("local", location.Location).field("occupancy", location.Occupancy)
+  #location_dict = json.loads(LocationInventory)
+  for key, value in LocationInventory["rooms"].items():
+    _point = Point(TABELA_LOCATION).tag("location", key).field("occupancy", value)
     record.append(_point)
 
   # Write to temporary table
   write_api.write(bucket=INFLUXDB_DBNAME, record=record)
 
-  # Build trace query
-  query = QUERY_TRACE % (targetUser, startTime, stopTime, TABELA_TRACE)
+  # Build max occupancy query
+  query = QUERY_MAX_OCCUPANCY % (startTime, TABELA_TOTAL, TABELA_LOCATION)
   tables = client.query_api().query(query)
   client.__del__()
 
   # Query result is a list of all tables creted in TRACE_QUERY, each of them of type FluxTable
   # see https://github.com/influxdata/influxdb-client-python/blob/master/influxdb_client/client/flux_table.py#L5 for more info
 
-  # Build result as a list of all found records in suspecTable
+  # Build result as a list of all found records in history table
   result =[]
   for table in tables:
     for record in table.records:
-      subdict = {x: record.values[x] for x in ['local','userid']}
+      subdict = {x: record.values[x] for x in ['_time','location', 'count', 'max', 'origin']}
       if subdict not in result:
         result.append(subdict)
   return result
@@ -170,5 +178,23 @@ def OccupancyReport(startTime):
 
 
 if __name__ == '__main__':
-  result = TraceReport("ana", "2020-07-14T00:00:00Z", "2020-07-14T02:00:00Z")
-  print (result)
+
+  # Teste do report de trace
+  result1 = TraceReport("ana", "2020-07-14T00:00:00Z", "2020-07-14T02:00:00Z")
+  print (result1)
+
+  # Teste do report de histórico
+  LocationInventory = {
+    "rooms": {
+        "Cozinhha": 1,
+        "EDU": 2,
+        "IND": 2,
+        "Quartos": 2,
+        "Sala": 2,
+        "Sandbox": 3
+    },
+    "versao": 5
+  }
+
+  result2 = OccupancyReport(LocationInventory=LocationInventory, startTime="-1y")
+  print (result2)
