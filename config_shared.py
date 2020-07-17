@@ -11,22 +11,22 @@ bot_tag='distancebot'
 # Meraki Parameters
 meraki_api_key="Meraki KEY here"
 # influx address
-db_server="localhost"
+db_server="159.89.238.176"
 db_server_port=8086
 # report code API address
-report_server="localhost"
+report_server="159.89.238.176"
 report_server_port=8000
 # mask detection API Address
-mask_server="localhost"
+mask_server="159.89.238.176"
 mask_server_port=10000
 # Webex Teams Bot Address
-bot_server="localhost"
+bot_server="159.89.238.176"
 bot_server_port=7000
 # Track API address
-tt_server="localhost"
+tt_server="159.89.238.176"
 tt_server_port=9000
 # Grafana Dashboard Address
-grafana_server="localhost"
+grafana_server="159.89.238.176"
 grafana_server_port=80
 
 # BD Variables

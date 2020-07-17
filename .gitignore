@@ -3,3 +3,4 @@ DB/__pycache__/DB_const.cpython-36.pyc
 QueryFlux-v1
 .vscode/settings.json
 .gitignore
+__pycache__/config_shared.cpython-36.pyc
