@@ -93,7 +93,7 @@ QUERY_BEST_DAY = \
          |> map(fn: (r) => ({r with hour: uint(v: date.hour(t: r._time)),day: uint(v: date.weekDay(t: r._time))})) \
          |> drop(columns: ["_start", "_stop", "_measurement", "origin", "_time"]) \
          |> group(columns: ["location", "hour", "day"]) \
-         |> max() \
+         |> mean() \
          |> yield(name: "t1")'
 
 
