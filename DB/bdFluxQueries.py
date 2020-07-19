@@ -59,7 +59,8 @@ QUERY_TRACE = \
 
 
 QUERY_MAX_OCCUPANCY = \
-  'startTime = %s \n\
+  'import "date" \n\
+   startTime = %s \n\
    TABELA_TOTAL = "%s"  \n\
    TABELA_LOCATION = "%s" \n\
                           \n\
@@ -73,10 +74,31 @@ QUERY_MAX_OCCUPANCY = \
          |> last() \
          |> map(fn: (r) => ({location: r.location, max: r._value}))  \n\
                                                                      \n\
-   history = join(tables: {count: t1, max: t2}, on:["location"]) \
+   t3 = join(tables: {count: t1, max: t2}, on:["location"]) \
          |> filter (fn: (r) => (r._value > r.max)) \
-         |> map(fn: (r) => ({_time: r._time, location: r.location, count: r._value, max: r.max, origin: r.origin}))  \
-         |> yield(name: "history")'
+         |> map(fn: (r) => ({_time: r._time, location: r.location, _field: r._field, _value: r._value, max: r.max})) \n\
+                                                                                                                    \n\
+   t4 = t3 |> window(every: 1h) |> max() \
+         |> duplicate(column: "_start", as: "_time") \
+         |> window(every: inf) \
+         |> map(fn: (r) => ({r with year: uint(v: date.year(t: r._time)), \
+                                    month: uint(v: date.month(t: r._time)), \
+                                    day: uint(v: date.monthDay(t: r._time)), \
+                                    hour: uint(v: date.hour(t: r._time))})) \
+         |> map(fn: (r) => ({r with shift: if (r.hour <=5) then "dawn" else \
+                                           if (r.hour <=12) then "morning" else \
+                                           if (r.hour <=19) then "afternoon" else "night"})) \
+         |> drop(columns: ["_start", "_stop", "_time", "_measurement"])  \n\
+                              \n\
+   historyHour = t4 \
+         |> group(columns: ["location", "year", "month", "day", "hour"]) \
+         |> max() \
+         |> yield(name: "historyHour")\n\
+                              \n\
+   historyShift = t4 \
+         |> group(columns: ["location", "year", "month", "day", "shift"]) \
+         |> max() \
+         |> yield(name: "historyShift")'
 
 
 QUERY_BEST_DAY = \
@@ -144,15 +166,29 @@ def TraceReport(targetUser, startTime, stopTime):
 #    LocationInventory: Dictionary with location inventory
 #    startTime = string with initial time for report (ex: "-1w")
 #
-# Output: List of dictionaty entries with rooms with higher occupancy than allowed.
-#    Dictionary keys:
-#    {
-#     '_time'   : time that event was detected
+# Output: Dictionary with history list per location/day/hour and per location/day/shift.
+#    Dictionaty format:
+#
+#    {'PerHourHistory': [<list of occurrences per location/day/hour>],
+#     'PerShiftHistory': [<list of occurrence per location/day/shift]}
+#
+#    Example:
+#
+#    {'PerHourHistory': 
+#       [{'location': 'Sala', '_value': 3, 'max': 2, 'year': 2020, 'month': 6, 'day': 17, 'hour': 11},  
+#        ...], 
+#     'PerShiftHistory': 
+#       [{'location': 'Sala', '_value': 3, 'max': 2, 'year': 2020, 'month': 6, 'day': 17, 'shift': 'afternoon'}, 
+#        ...] }
+#
+#     PS:
 #     'location': room where event occurred
-#     'count'   : number of people detect at this room at this time
-#     'max'     : maximum number allowed in this room
-#     'origin'  : indicates how measurement was made
-#    }
+#     '_value'  : maximum number of people detect at this room at this date/hour or date/shift
+#     'max'     : maximum number of peopple allowed in this room
+#     'year', 'month', 'day': date that event was detected
+#     'hour'    : hour on which event occurred
+#     'shift'   : shift on which event occurred (dawn, morning, afternnon ou night)
+#
 #---------------------------------------------------------------------------------------
 def OccupancyReport(LocationInventory, startTime):
 
@@ -183,11 +219,15 @@ def OccupancyReport(LocationInventory, startTime):
   # see https://github.com/influxdata/influxdb-client-python/blob/master/influxdb_client/client/flux_table.py#L5 for more info
 
   # Build result as a list of all found records in history table
-  result =[]
+  result = {"PerHourHistory" :[], "PerShiftHistory": []}
   for table in tables:
     for record in table.records:
-      subdict = {x: record.values[x] for x in ['_time','location', 'count', 'max', 'origin']}
-      result.append(subdict)
+      if  (record.values['result'] == 'historyHour'): 
+        subdict = {x: record.values[x] for x in ['location', '_value', 'max', 'year', 'month', 'day', 'hour']}
+        result["PerHourHistory"].append(subdict)
+      elif  (record.values['result'] == 'historyShift'): 
+        subdict = {x: record.values[x] for x in ['location', '_value', 'max', 'year', 'month', 'day', 'shift']}
+        result["PerShiftHistory"].append(subdict)
   return result
 
 
