@@ -11,6 +11,7 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 from config_shared import INFLUXDB_HOST, INFLUXDB_PORT, INFLUXDB_DBUSER, INFLUXDB_DBPASSWORD, INFLUXDB_DBNAME, INFLUXDB_USER, INFLUXDB_PASSWORD
 from config_shared import TABELA_MV, TABELA_TOTAL, TABELA_TRACE
 import json
+import pandas as pd
 
 
 ######  MUITO IMPORTANTE: A SER REMOVIDO ##################################
@@ -247,6 +248,13 @@ def OccupancyReport(LocationInventory, startTime):
 #     'hour': 0 to 23, indicating hour in the day 
 #     'location': location identification 
 #    }
+#
+# Example:
+#   [{'location': 'Cozinha', 
+#     'bestday': ['Mo', 'Tu'], 
+#     'report': {'Mo': 0.0, 'Tu': 0.0, 'We': 2.5, 'Th': 2.0, 'Fr': 1.0}
+#    },
+#    ...]
 #---------------------------------------------------------------------------------------
 def BestDayReport(startTime):
 
@@ -270,6 +278,80 @@ def BestDayReport(startTime):
       subdict = {x: record.values[x] for x in ['_value','day', 'hour', 'location']}
       result.append(subdict)
   return result
+
+
+
+
+#---------------------------------------------------------------------------------------
+# Best day 
+#
+# Description:
+# Parse BestDayReport output in order to infer which are the best days 
+#
+# Input:
+#    report = output of BestDayReport
+#    hour1, hour2 = begin and end of time rang of interest (ex: 9,12)
+#
+# Output: List of dictionaty entries with information for each location
+#    Dictionary keys:
+#    {
+#     'location': id of location 
+#     'bestday': list of best days to work considering the provided time range in this location
+#     'report': average of maximum allocation for each day in this location considering the provided time range
+#    }
+#---------------------------------------------------------------------------------------
+def BestDay (report, hour1, hour2):
+  # Convert report from a list of dictionaries to a Panda Data Frame
+  df = pd.DataFrame(report)
+
+  # Select only the rows which hours are in the provided range
+  df = df.loc[df['hour'].isin(range(hour1,hour2+1))]
+
+  #Exclude 'hour' column
+  df = df[df.columns.difference(['hour'])]
+
+  # Group by location/day, selecting the maximum count epr location/day
+  df = df.groupby(['location','day']).agg({'_value': ['max']})
+  df.columns=['max']
+  df = df.reset_index()
+
+  # Create an auxiliar dataframe with days 1 to 5 (Mon to Fri) fro each existing location
+  data = []
+  weekdays = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa']
+  for location in df.location.unique():
+    for day in range(1,6):
+      data.append({'location': location, 'day': day, 'weekday':weekdays[day]})
+  days = pd.DataFrame(data)
+
+  # Merge result with this auxiliar dataframe so that there is a row for all location/weekday  
+  df = df.merge(how='right', right=days, on=['location', 'day'])
+
+  # Fill all NA (not available) values with 0
+  df = df.fillna(value=0)
+
+  # Sort result by location/max/day
+  df = df.sort_values(['location', 'day'])
+
+  #Build best day dictionary per location
+  result = []
+  for location in df.location.unique():  # For each unique location
+    #select only rows of this location
+    df1 = df.loc[df['location'] == location] 
+    #build a dataframe withh maximum avarage occupancy per weekday
+    max = df1['max']
+    max.index=df1['weekday'] 
+    #obtem a menor média de ocupação dessa localidade
+    min_occupancy = min(max.tolist())
+    #build dictionary entry for this location
+    dict = {}  #initialize dict as a dictionary
+    dict['location'] = location  
+    df2 = df1.reset_index()
+    dict['bestday'] = df2.loc[df2['max'] == min_occupancy]['weekday'].tolist()
+    dict['report'] = max.to_dict()    
+    result.append(dict)
+
+  return(result)
+
 
 
 
@@ -299,3 +381,5 @@ if __name__ == '__main__':
   # Teste do report de best day
   result3 = BestDayReport (startTime="-1y")
   print (result3)
+  result4 = BestDay (result3, 9, 12)
+  print(result4)
