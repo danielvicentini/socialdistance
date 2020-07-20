@@ -249,12 +249,6 @@ def OccupancyReport(LocationInventory, startTime):
 #     'location': location identification 
 #    }
 #
-# Example:
-#   [{'location': 'Cozinha', 
-#     'bestday': ['Mo', 'Tu'], 
-#     'report': {'Mo': 0.0, 'Tu': 0.0, 'We': 2.5, 'Th': 2.0, 'Fr': 1.0}
-#    },
-#    ...]
 #---------------------------------------------------------------------------------------
 def BestDayReport(startTime):
 
@@ -299,6 +293,13 @@ def BestDayReport(startTime):
 #     'bestday': list of best days to work considering the provided time range in this location
 #     'report': average of maximum allocation for each day in this location considering the provided time range
 #    }
+#
+# Example:
+#   [{'location': 'Cozinha', 
+#     'bestday': ['Mo', 'Tu'], 
+#     'report': {'Mo': 0.0, 'Tu': 0.0, 'We': 2.5, 'Th': 2.0, 'Fr': 1.0}
+#    },
+#    ...]
 #---------------------------------------------------------------------------------------
 def BestDay (report, hour1, hour2):
   # Convert report from a list of dictionaries to a Panda Data Frame
