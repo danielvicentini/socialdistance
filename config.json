@@ -2,7 +2,8 @@
     "rooms": {
         "quartos": 100,
         "cozinha": 13,
-        "sala": 12
+        "sala": 12,
+        "BCIC": 3
     },
     "versao": 5
 }
