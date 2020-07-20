@@ -3,9 +3,10 @@
 
 """
 Python syslog client.
-
+ 
 This code is placed in the public domain by the author.
 Written by Christian Stigen Larsen.
+(Edited by Lucas Pavanelli)
 
 This is especially neat for Windows users, who (I think) don't
 get any syslog module in the default python installation.
