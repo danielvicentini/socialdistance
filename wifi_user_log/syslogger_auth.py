@@ -28,7 +28,7 @@ optional arguments:
                         Syslog level, info: 6, alert: 1, warning: 4
   -H HOST, --host HOST  remote syslog server ip.
   -p PORT, --port PORT  remove syslog server port.
-
+ 
 """
 
 import socket
