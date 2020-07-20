@@ -39,13 +39,17 @@ memoria={}
 # Bot options
 #---------------------------------------------------
 
+def le_config():
+    try:
+        with open('config.json',encoding='utf-8') as json_file:
+            configuracao=json.load(json_file)  
+    except:
+        pass
+    return configuracao
+
 configuracao=dict()
 # carrega  configuracoes, caso tenha
-try:
-    with open('config.json',encoding='utf-8') as json_file:
-	    configuracao=json.load(json_file)  
-except:
-	pass
+configuracao = le_config()
 
 # Bot options
 # config strcuture
