@@ -6,7 +6,7 @@ import os
 sys.path.append(os.path.abspath('..'))
 sys.path.append(os.path.abspath('bot'))
 
-from bd_flux import TraceReport, OccupancyReport, BestDayReport
+from bdFluxQueries import TraceReport, OccupancyReport, BestDayReport
 from config import le_config
 
 """
