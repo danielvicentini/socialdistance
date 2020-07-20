@@ -240,18 +240,21 @@ def showRunning():
 
     return msg
 
-def reportDistancing():
+def reportDistancing(periodo):
 
+    # adiciona sinal negativo
+    periodo=f"-{periodo}"
+  
 # funcao historico
 
     msg=""
     msg=msg+"  \nO histórico é o seguinte:  \n"
-    msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
-    msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
+    #msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
+    #msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
 
     try:
         # Teste de código para consultar report
-        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/totalcount/hoje"
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/totalcount/{periodo}"
         headers = {'Content-Type': "application/json" }
         response = requests.request("GET", url, headers=headers)
         msg=msg+response.text
@@ -260,18 +263,37 @@ def reportDistancing():
 
     return msg
 
-def reportTracing (pessoa):
+def reportBestday(periodo):
 
-    # report of people tracing
-
+    # adiciona sinal negativo
+    periodo=f"-{periodo}"
+  
     msg=""
-    msg=msg+f"Tracing ***{pessoa}***:  \nList of close people in the previous weeks:  \n"
-    msg=msg+f"Week 1: ana, daniel, andrey, adilson  \n"
-    msg=msg+f"Week 2: Ana, Danie, Flávio  \n"
+    msg=msg+"  \nBest Day to go to the office:  \n"
+
+    try:
+        # Teste de código para consultar report
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/bestday/{periodo}"
+        headers = {'Content-Type': "application/json" }
+        response = requests.request("GET", url, headers=headers)
+        msg=msg+response.text
+    except:
+        msg="\nCan't connect to server.  \n"
+
+    return msg
+
+
+def reportTracing (pessoa,periodo):
+
+    # adiciona sinal negativo
+    periodo=f"-{periodo}"
+  
+    # report of people tracing
+    msg=""
 
     # Teste de código para consultar report
     try:
-        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/ana"
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/{pessoa}&{periodo}"
         headers = {'Content-Type': "application/json" }
         response = requests.request("GET", url, headers=headers)
         msg=msg+response.text
@@ -548,7 +570,7 @@ def logica(comando,usermail):
                 elif codigo==14:
                     # Stop camera for mask detection
                     camera=lista_parametros[0]
-                    func=cameraStart(camera)
+                    func=cameraStop(camera)
                     msg=msg+func
 
                 elif codigo==51:
@@ -558,15 +580,18 @@ def logica(comando,usermail):
                                     
                 elif codigo==52:
                     # Tracing
+                    # terminar... ainda não está pedindo todos os parametros
                     pessoa=lista_parametros[0]
-                    func=reportTracing(pessoa)
+                    periodo=lista_parametros[1]
+                    func=reportTracing(pessoa,periodo)
                     msg=msg+func
                                        
                 elif codigo==53:
                     # Best Day
+                    periodo=lista_parametros[0]
                     msg=msg+f"Best days to go to office:  \n"
-                    msg=msg+f"Thursday: ***8h00-9h00***, ***16h00-17h00***  \n"
-                    msg=msg+f"Friday: ***8h00-10h00***  \n"
+                    func=reportBestday(periodo)
+                    msg=msg+func
 
                 elif codigo==54:
                     # Mask Detection
@@ -579,7 +604,8 @@ def logica(comando,usermail):
                     msg=msg+func
 
                 elif codigo==31:
-                    func=reportDistancing()
+                    periodo=lista_parametros[0]
+                    func=reportDistancing(periodo)
                     msg=msg+func
                     
 

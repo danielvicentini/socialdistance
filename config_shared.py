@@ -9,7 +9,9 @@ bot_token="your bot token"
 bot_email="botuser@botdomain.com"
 bot_tag='distancebot'
 # Meraki Parameters
-meraki_api_key="Meraki KEY here"
+MERAKI_API_KEY ="Meraki KEY here"
+MERAKI_ORG_ID = "711568741124539904"
+MERAKI_NET_ID = "N_711568741124571996"
 # influx address
 db_server="159.89.238.176"
 db_server_port=8086
@@ -28,6 +30,9 @@ tt_server_port=9000
 # Grafana Dashboard Address
 grafana_server="159.89.238.176"
 grafana_server_port=80
+# Trigger Address
+trigger_server="159.89.238.176"
+trigger_server_port=8080
 
 # BD Variables
 INFLUXDB_HOST = db_server

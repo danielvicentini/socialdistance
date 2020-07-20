@@ -4,6 +4,10 @@
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
+sys.path.append(os.path.abspath('bot'))
+
+from bdFluxQueries import TraceReport, OccupancyReport, BestDayReport
+from config import le_config
 
 """
 Definition of paramater that allow connecting to the SocialDistance DB
@@ -62,7 +66,7 @@ class DBClient():
       #Return True to indicate that data was recorded
       return True
 
-  def TotalCount(self, local: str, total: int):
+  def TotalCount(self, local: str, total: int, origem: str, people:list):
       """
       Escreve no banco total de usuarios naquele local
       """
@@ -72,8 +76,10 @@ class DBClient():
       json_body["measurement"] = TABELA_TOTAL
       json_body["tags"] = {}
       json_body["tags"]["local"] = local
+      json_body["tags"]["origin"] = origem
       json_body["fields"] = {}
       json_body["fields"]["total"] = total
+      json_body["fields"]["people"] = people
       
       # Write data to InfluxDB
       self._client.write_points([json_body])
@@ -162,28 +168,59 @@ class DBClient():
 
 def bd_consulta(tabela,filtro):
 
+    msg=""
+
     global TABELA_MV, TABELA_TOTAL, TABELA_TRACE
 
     #open DB
-    banco=DBClient()
-
+   
     if tabela=="totalcount":
-        tabela=TABELA_TOTAL
+        
+        # Chama consulta Flux para Contagem dos dias acima dos thresh hodls
+        x=OccupancyReport(le_config(), filtro)
+        print (x)
+        for b in x:
+            msg=msg+f"Sala {b['location']} count {b['count']}  \n"
+        print (msg)
+        return msg
+        #tabela=TABELA_TOTAL
+    
     elif tabela=="peoplelog":
-        tabela=TABELA_TRACE
+        # TERMINAR... TRACE REQUER 3 PARAMETROS PESSOA, INICIO E FIM DA OBSERVAÇÃO..
+        # PENSAR NISSO
+        #tabela=TABELA_TRACE
+        #x=TraceReport()
+        #print (x)
+        #for b in x:
+        #    msg=msg+f"Sala {b['location']} count {b['count']}  \n"
+        #print (msg)
+        msg = "função não está pronta."
+        return msg
+
+    elif tabela=="bestday":
+        # Report Best Day
+        x=BestDayReport(filtro)
+        print (x)
+        for b in x:
+            msg=msg+f"Day {b['day']} Location {b['location']}  \n"
+        print (msg)
+        return msg
+        
+    
     elif tabela=="sanityMask":
+        # Chama consulta dos eventos sem mascara
+        banco=DBClient()
         tabela=TABELA_MV
         x=banco.ConsultaMask(tabela,filtro)
         banco.Close()
         return x
     else:
-        banco.Close()
         return "tabela nao encontrada"
 
-    query=banco.Consulta(tabela,filtro)
-    banco.Close()
+    #query=banco.Consulta(tabela,filtro)
+    #banco.Close()
 
-    print (query)
+    #print (query)
     return f"consulta na tabela {tabela} ok"
 
     
@@ -213,7 +250,9 @@ def bd_update(json_content):
     # {
     #    "type":"totalcount",
     #    "local":"SALA_log2",
+    #    "origin": "camera"
     #    "total":100
+    #    "people":"people1@email,people2@email"
     #}
 
     # Tipo 3 - Pessoas detectadas sem mascara
@@ -240,7 +279,7 @@ def bd_update(json_content):
             banco.peopleLog(json_content["local"],json_content["userid"],json_content["status"],json_content["origem"])
 
         elif tipo == "totalcount":
-            banco.TotalCount(json_content["local"],json_content["total"])
+            banco.TotalCount(json_content["local"],json_content["total"],json_content['origin'],json_content['people'])
 
         elif tipo == "sanitymask":
             banco.SanityMask(json_content["local"],json_content['network'],json_content['serial'],json_content['url'],json_content["time"])

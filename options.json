@@ -28,7 +28,8 @@
 		"desc": "Show report distancing in the rooms.",
 		"option": 31,
 		"admin": true,
-		"req": false
+		"req": true,
+		"params": "number of days (d) or hours (h)"
 	}, {	
 		"tag": "trace tracing",
 		"title": "Report tracing",
@@ -43,7 +44,8 @@
 		"desc": "Show days with the lowest know presence at the office.",
 		"option": 53,
 		"admin": false,
-		"req": false
+		"req": true,
+		"params": "number of days (d) or hours (h)"
 	}, {
 		"tag": "report mask",
 		"title": "Report of Mask Detection compliance",

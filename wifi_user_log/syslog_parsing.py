@@ -1,6 +1,6 @@
-from pprint import pprint
-import json
+from meraki_initial_query import CurrentWifiUsers
 import requests
+import json
 
 ## Parse the logfile genetated by the Syslog Server to capture
 ## WiFi users logging in and out.
@@ -42,9 +42,21 @@ def syslog_parsing(line):
 		log["identity"] = identity
 
 	except: pass
-
+	print(log)
 	#Call the function that will update the user count
 	wifi_user_count_log(log)
+
+def sendtobot(wifi_count):
+#[LP] Function to send alerts to middleware (trigger file)
+#middleware send post to webex bot
+
+	url = "http://127.0.0.1:8080/triggers"
+	payload = json.dumps(wifi_count[0])
+	headers = {
+  		'Content-Type': 'application/json'
+	}
+
+	response = requests.request("POST", url, headers=headers, data = payload)
 
 def wifi_user_count_log(log):
 #Function to process the WiFi log parsed to capture just
@@ -116,6 +128,8 @@ def wifi_user_count_log(log):
 			print("Updated WiFi list is :")
 			print(wifi_count)
 			print()
+			
+			sendtobot(wifi_count)
 
 			""" TODO
 			Add here a function that gest the wifi_count list of dict and create a new entry in the DB
@@ -128,7 +142,7 @@ def wifi_user_count_log(log):
 			print("Updated WiFi list is :")
 			print (wifi_count)
 			print()
-
+			sendtobot(wifi_count)
 
 	#check if the entry is for an association of an authenticated user with identity	
 	elif "identity" in log and log["type"] == "8021x_auth":
@@ -193,7 +207,7 @@ def wifi_user_count_log(log):
 			print("Updated WiFi list is :")
 			print(wifi_count)
 			print()
-
+			sendtobot(wifi_count)
 			""" TODO
 			Add here a function that gest the wifi_count list of dict and create a new entry in the DB
 			"""
@@ -213,31 +227,56 @@ def wifi_user_count_log(log):
 add here the function that will update the wifi count status
 on the DB
 """
+#def post_trigger()
+
 
 if __name__ == '__main__':
 
 	#starting the dict logs and wifi_count list
 	log = {}
+	wifi_count = []
+
+
+	"""TODO
+	#make a function here to grab this info from Meraki
+	#get the list of AP and the users
+	#make the list wifi_count that has all the APs dict
+	#
+	#At this point starting with a manual imput with zero clients
+	#code will handle the error inserted because of that
+
+
+	wifi_count = [
+		{"ap_name": "MR33_Sala",
+		"ap_user_count": 0,
+		"clients_identity": [],
+		"last_update": ""
+		},
+		{"ap_name": "MR18_Quartos",
+		"ap_user_count": 0,
+		"clients_identity": [],
+		"last_update": ""
+		},
+		{"ap_name": "MR24_Cozinha",
+		"ap_user_count": 0,
+		"clients_identity": [],
+		"last_update": ""
+		}
+		]
+"""
 	#idea for the wifi_count list including users mac address
 	#{"ap_name": ap_name, "ap_user_count": new_ap_user_count, "clients_identity": new_identity_list, "clients_mac": new_client_mac_list}
 	#not implemented with mac address because the logic is not ready to handle the scenario of a user with multiple devices
 
-	wifi_count_json = requests.get('http://localhost:7000/wificount/CurrentWifiUsers')	
-	wifi_count = json.loads(wifi_count_json.text)
-
+	wifi_count = CurrentWifiUsers()
+	print()
 	print("Initial WiFi list is :")
-	pprint (wifi_count)
+	print (wifi_count)
 	print()
 	print()
 
-	try:
-		with open('youlogfile.log') as f:
-			while True:
-				line = f.readline()
-				if line:
-					syslog_parsing(line)
-					#send_alert()
-	except (IOError, SystemExit):
-		raise
-	except KeyboardInterrupt:
-		print ("Crtl+C Pressed. Shutting down.")
+	with open('youlogfile.log') as f:
+		while True:
+			line = f.readline()
+			if line:
+				syslog_parsing(line)
