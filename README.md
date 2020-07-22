@@ -106,6 +106,45 @@ The Following resources will be needed before the installation:
 * The following 4 Webex Teams pieces of information are necessary: bot email, bot token, bot tag, and bot public URL address - This URL should be the public address where this application will be hosted. Any public Internet Source service that hosts aplications and provide public Web access should work.
 * A Meraki API-key. The application connects with Meraki Dashboard and Meraki MV API. The API-Key can be generate in the Settings Dashboard at http://dashboard.meraki.com
 
+## Instalation
+
+### Environment preparation
+
+* Define a Public Server with the minimun hardware specifications: 1vCPU, 1GB RAM, 25GB Storage.
+* Install the following components: Python 3.7, Influx DB Server 1.8, Latest Grafana Dashboard
+* Create a directory to git clone this project. Sugestion: mkdir /var/Social
+* Git Clone this project to your directory
+
+### Setup Components
+
+### Influx DB Server
+
+* Create "socialdistance" database
+
+### Grafana Dashboard Server
+
+* PENDENTE
+
+### Python
+
+* Go the project directory
+* Install necessary libs with the command: pip3 install -r requirements.txt
+
+### Webex Teams
+
+* Define a Webex Teams Room Name for the Admins/Facility Managers
+* Include the Bot name in the room
+* Include the admins users in the room
+* Have the admins users list, it will be used for the project setup.
+
+### Meraki
+
+* Have the Public Internet IP of your Machine hosting this project
+* Login in the DashBoard
+* Setup Meraki Wireless to send information: Network-wide->Configure->General->Reporting
+* Define the Role: "Wireless event log". Point to Public IP used + port 514. Apply
+* Setup Meraki Cameras: Cameras->Settings->Sense->MQTT Broker->Add MQTT Broker.
+* Use the following parameters: Eclipse Broker, Mqtt.eclipse.org, Port: 1883, Security None. Apply
 
 ## Documentation
 
