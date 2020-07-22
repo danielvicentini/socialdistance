@@ -183,7 +183,7 @@ This file inventory.py must be edited to include all Meraki devices user for the
 
 With the proper information, the Project is ready to start.
 
-* In the directory of the project, execute: sudo SocialDistance.sh to start all the modules.
+* In the directory of the project, execute: *sudo SocialDistance.sh* to start all the modules.
 
 ### Using for the first time
 
@@ -193,7 +193,7 @@ It is necessary to define at least 1 room and maximum quantity of people in that
 
 It is necessary to activate at least 1 camera for Facial Mask Detection to start analyzing it and recording. Use the "start camera" for that.
 
-
+It is necessary enough data for a proper report quality. We suggest at least one week of data.
 
 ## How the Project Works
 
@@ -238,6 +238,45 @@ The Alert is done by sending certain alert type to the Bot, wich will in its tur
 The Facil Mask Detection is responsible to analyze office images and detect people without Facial Mask. The Module runs whenever the Facility Manager/Admin ask to a particular Camera to do it.
 At the Bot, the Admin informs Camera Name he/her need to detected faces. After that the Facial Mask Detection system starts, it runs periodic checks in the room, taking a picture and analyzing it for out of compliance events.  Whenever it founds it, it will alarm Admins about this. It will also sends event data to be stored for reporting.
 
+
+### Suport
+
+## Checking if the modules are running
+
+Process of each module after start:
+
+**Social Bot**
+* socialbot.py
+**DB and Report Server**
+* report.py
+**Track System**
+* pysyslog.py
+* syslog_parsing.py
+* trigger.py
+**Mask Detection**
+* mask-detection/app.py
+
+## Troubleshooting
+
+**Can't talk to the bot**
+* Is the config_shared.py variables correct? (most common problem)
+* Are Webhooks from Webex Teams reaching your server? (can be related to the bot tag or URL Problem)
+* Is there any Firewall service blocking http webhooks from the Internet?
+
+**No Data being generated**
+* Is Meraki Networking send syslog data to the application?
+* Is MV sending MQTT data to the application
+* Is influxDB running?
+* Is InfluxDB user/password correctly configure?
+* Is the config_shared.py variables correct? (most common problem)
+* Is there any Firewall service blocking MQTT/Syslog from the Internet?
+
+**Reports at the bot replys 'Can't connect to the server'**
+* Is influxDB running?
+* Is InfluxDB user/password correctly configure?
+
+**Reports at the bot replys 'No data'**
+* Are there enough data?
 
 
 ## License
