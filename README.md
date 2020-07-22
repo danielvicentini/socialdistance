@@ -121,6 +121,8 @@ The Following resources will be needed before the installation:
 ### Influx DB Server
 
 * Create "socialdistance" database
+* Define root users and password
+* Define DBuser and password
 
 ### Grafana Dashboard Server
 
