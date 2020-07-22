@@ -6,7 +6,7 @@ cd track_system
 nohup python3 pysyslog.py &
 nohup python3 syslog_parsing.py &
 nohup python3 trigger.py &
-cd facemask-detection
+cd mask-detection
 echo Mask Detection start
 nohup python3 app.py &
 cd..
