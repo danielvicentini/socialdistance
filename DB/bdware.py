@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 ## Variaveis
 
+
+# 21.07.2020
+# DB Functions for DB writes and reports
+
 import sys
 import os
 sys.path.append(os.path.abspath('..'))
 sys.path.append(os.path.abspath('bot'))
 
-from bdFluxQueries import TraceReport, OccupancyReport, BestDayReport
+from bdFluxQueries import TraceReport, OccupancyReport, BestDayReport, BestDay
 from config import le_config
 
 """
@@ -20,7 +24,6 @@ from influxdb import InfluxDBClient
 import json
 import time
 
-# DB Functions
 
 """TimeSeries DataBase Class."""
 
@@ -43,6 +46,7 @@ class DBClient():
     self._client = InfluxDBClient(self._host, self._port, self._user, self._password, self._dbname)
     
   def Close(self):
+    # Closes DB
     self._client.close()
 
   def peopleLog(self, local: str, userid: str, status: str, origem: str):
@@ -50,7 +54,7 @@ class DBClient():
       Escreve no banco quando user entra ou sai
       """
      
-      # Prepare JSON with data to be writte in PeopleCount measurement
+      # Prepare JSON with data to be writte in PeopleLog (trace) measurement
       json_body = {}
       json_body["measurement"] = TABELA_TRACE
       json_body["tags"] = {}
@@ -71,15 +75,15 @@ class DBClient():
       Escreve no banco total de usuarios naquele local
       """
      
-      # Prepare JSON with data to be writte in PeopleCount measurement
+      # Prepare JSON with data to be writte in TotalPeopleCount measurement
       json_body = {}
       json_body["measurement"] = TABELA_TOTAL
       json_body["tags"] = {}
-      json_body["tags"]["local"] = local
+      json_body["tags"]["location"] = local
       json_body["tags"]["origin"] = origem
+      json_body["tags"]["people"] = people
       json_body["fields"] = {}
-      json_body["fields"]["total"] = total
-      json_body["fields"]["people"] = people
+      json_body["fields"]["count"] = total
       
       # Write data to InfluxDB
       self._client.write_points([json_body])
@@ -92,7 +96,7 @@ class DBClient():
       Escreve no banco eventos quando pessoas sem máscara
       """
      
-      # Prepare JSON with data to be writte in PeopleCount measurement
+      # Prepare JSON with data to be writte in SanityMask measurement
       json_body = {}
       json_body["measurement"] = TABELA_MV
       json_body["tags"] = {}
@@ -113,28 +117,9 @@ class DBClient():
 
     ### FALTA FUNCOES DE CONSULTA
 
-  def PeopleCountQuery(self, queryFilter=None):
-    """
-    Query PeopleCount. A filter may be specificified to be used in the WHERE clause.
-    """
-
-    # Prepare JSON with data to be writte in PeopleCount measurement
-    query = 'SELECT * from ' + TABELA_TRACE
-    if queryFilter is not None:
-      query = query + " WHERE " + queryFilter
-    
-    # Query data from InfluxDB
-    result = self._client.query(query)
-    return result
-
-  def Consulta(self, tabela: str, filtro:str):
-      query= 'SELECT LAST(*) from ' + tabela
-      result=self._client.query(query)
-      return result
-
   def ConsultaMask(self, tabela: str, tempo:str):
       
-      # Consulta deteccao da Mascara nos ultimos 15 dias, 3 dias e ultimo dia
+      # Count qty of events in the Mask table
 
       query= 'SELECT count(url) from ' + tabela
 
@@ -156,83 +141,154 @@ class DBClient():
         texto = f"{x} events in the past {tempo} time."
 
       except:
-          texto = "Error in the query. Try XXd (for past days) or XXh (for past hours)."
+          texto = "Error in the query. Try XXd (for past days)"
 
-      json = { "msg":texto}
-      return json
+      msg=texto
+      return msg
 
-    
+
 
 
 # BD report
 
 def bd_consulta(tabela,filtro):
 
+    
+    # 21.7.2020
+    # English
+    # This function will run reports on the DB
+    # Reports use regular influx for (Mask detection) and Flux for complex reports (BestDay, Occupancy/History and TracePeople)
+    # Code will call each function basead on a table (tabela) variable and filter (filtro) defined by user
+    # Most of cases, filtro is a point in the time where data is collected for the investigation
+    # Returns code in JSON format
+    
     msg=""
 
     global TABELA_MV, TABELA_TOTAL, TABELA_TRACE
 
-    #open DB
-   
+    
     if tabela=="totalcount":
         
-        # Chama consulta Flux para Contagem dos dias acima dos thresh hodls
-        x=OccupancyReport(le_config(), filtro)
-        print (x)
-        for b in x:
-            msg=msg+f"Sala {b['location']} count {b['count']}  \n"
-        print (msg)
-        return msg
-        #tabela=TABELA_TOTAL
+        # Reports Social Distance Out of Compliance in room by shifts
     
+        # Chama consulta e retorna os períodos fora de compliance
+        # Chama consulta Flux para Coleta da base de dados conforme filtro
+        try:
+            x=OccupancyReport(le_config(), filtro)
+        except:
+            #Msg de erro caso filtro venha errado
+            msg="Query Error"
+            
+        
+        try:
+            #Formata msg de saída do Filtro
+            for b in x['PerShiftHistory']:
+                msg=msg+f"Room: {b['location']}  Data: {b['day']}-{b['month']}-{b['year']} Shift: {b['shift']}   \n"
+                print (msg)
+        except:        
+            #Msg de erro caso filtro venha errado
+            msg="Error in the query. Try XXd (for past days)"
+            
+        if msg=="":
+            msg="No data  \n"
+
     elif tabela=="peoplelog":
-        # TERMINAR... TRACE REQUER 3 PARAMETROS PESSOA, INICIO E FIM DA OBSERVAÇÃO..
-        # PENSAR NISSO
-        #tabela=TABELA_TRACE
-        #x=TraceReport()
-        #print (x)
-        #for b in x:
-        #    msg=msg+f"Sala {b['location']} count {b['count']}  \n"
-        #print (msg)
-        msg = "função não está pronta."
-        return msg
+
+        # Reports tracing of people (who's close to) in a certain period of time
+            
+        params=filtro.split('&')
+        # Checa e só continua se qtde de parametros correta
+        if len(params)!=3:
+            msg="Trace: Missing parameters. Requires: userid, start time, end time.  \n"
+            
+        elif len(params)==3:
+            # parametros ok, continua
+
+            personid=params[0]
+            start=params[1]
+            end=params[2]
+            print(params)
+            try:
+                # realiza consulta
+                print ("trace")
+                x=TraceReport(personid,start,end)
+                print (x)
+                minhalista=list()
+            except:
+                #Msg de erro caso filtro venha errado
+                msg="Query Error.Format: personid: username, start: YYYY-MM-DD, end: YYYY-MM-dd"
+            
+            try:
+                #montagem da resposta
+                for b in x:
+                    minhalista.append(b['userid'])
+                    minhalista=list(dict.fromkeys(minhalista))    
+                    
+                msg="List of users close:  \n"
+                for b in minhalista:
+                    
+                    msg=msg+f"{b}  \n"
+                if len(minhalista)==0:
+                    msg="No data."
+            except:
+                msg="No Data or Query Error.  \n"
+            
+
+            
 
     elif tabela=="bestday":
-        # Report Best Day
-        x=BestDayReport(filtro)
-        print (x)
-        for b in x:
-            msg=msg+f"Day {b['day']} Location {b['location']}  \n"
-        print (msg)
-        return msg
         
+        
+        # Report Best Day to go to the office
+        # 
+        #try:
+        # Massa de dados do periodo informado
+        x=BestDayReport(filtro)
+        # consolida os melhores dias durante o horário comercial
+        y=BestDay(x,9,12)
+        print (y)
+        # monta a mensagem
+        for b in y:
+            msg=msg+f"Room: {b['location']} - Best Days: {b['bestday']}  \n"
+        print (msg)
+        #return msg
+        #except:
+            #msg="No Data and/or Query Error. \n"
+            #return "No Data and/or Query Error. \n"
     
     elif tabela=="sanityMask":
+
+        # Reports qty of events of people not wearing Mask during a certain period of time
+
         # Chama consulta dos eventos sem mascara
         banco=DBClient()
         tabela=TABELA_MV
-        x=banco.ConsultaMask(tabela,filtro)
+        msg=banco.ConsultaMask(tabela,filtro)
         banco.Close()
-        return x
+        
     else:
-        return "tabela nao encontrada"
-
-    #query=banco.Consulta(tabela,filtro)
-    #banco.Close()
-
-    #print (query)
-    return f"consulta na tabela {tabela} ok"
+        msg="Table information not found."
 
     
+    json = { "msg":msg}
+    return json
 
 
 # BD update via JSON content
 
 def bd_update(json_content):
 
+    # 21.7.2020
+    # English
+    # This function updates DB according to data type and parameters send in format of a JSON content
+    # Details bellow of JSON format
+    # Code will identify tipo and calls appropiate function to write to the DB
+
+
     # initiate DB
     banco=DBClient()
     
+
     # faz upload do BD conforme JSON POSTADO
 
     # Tipo 1 - raw de entrada e saida de usuario
@@ -279,7 +335,7 @@ def bd_update(json_content):
             banco.peopleLog(json_content["local"],json_content["userid"],json_content["status"],json_content["origem"])
 
         elif tipo == "totalcount":
-            banco.TotalCount(json_content["local"],json_content["total"],json_content['origin'],json_content['people'])
+            banco.TotalCount(json_content["location"],json_content["count"],json_content['origin'],json_content['people'])
 
         elif tipo == "sanitymask":
             banco.SanityMask(json_content["local"],json_content['network'],json_content['serial'],json_content['url'],json_content["time"])
