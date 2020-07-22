@@ -183,9 +183,44 @@ With the proper information, the Project is ready to start.
 
 * In the directory of the project, execute: sudo SocialDistance.sh to start all the modules.
 
-## Documentation
+## How the Project Works
 
-Pointer to reference documentation for this project.
+The SocialDistance project consists of 4 independent modules that shares information with each other via an API Rest-based model. Each folder of this project has more detail of each piece of code for each module.
+
+### Modules Documentation
+
+
+### Social Bot
+
+This module is the piece of code that interacts with the user via Webex Teams. It will chat with the user depending its role (regular employee, admin) and will execute certain commands that each user are entitled to do.
+The Social bot is the piece that talks to all modules in the project. Whenever an admin defines a Rooms Compliance situation or activates camera detection, the bot take this orders and send signails to the tracking and facial mask detection modules respectively. When alarms is created such as out of compliance in the room (more people than expected) or people with no mask detected, the Tracking and Mask detection modules send signals back to the bot, who will be in charge to alarm user.
+Reporting is done trought the Bot also. Whenever a user needs information about the data collected, he/her asks information to the bot, which will ask the report to the Data Base / Report Server and then provide the information to the user in the form of a text message.
+
+### Data Base Storage and Analysis / Report Server
+
+This module touches de Influx DB for recording and delivery reports. The MaskDetection and Track modules uses this service to store information. The Bot uses this module to gather the report data.
+It receives data and stores it in the Influx DataBase using tables.
+* The Trace table which stores data whenever users move in the Meraki network as well as when people is detected via Meraki Cameras.
+* The Count table records the summing of people in the office.
+* The MaskDetection table records whenever the Camera detects people without Mask in the office.
+Busides recording, the Data Storage Module produces reporting of the consolidated data. It can report:
+* Historic of Occupancy,
+* Best Days to go to the office, 
+* Tracing of people and 
+* History about Mask events.
+
+### Tracking of Users
+This module receives information from the Meraki Network, both Cameras and WiFi AccessPoints. It normalizes the information, whenever an user logs in our out or when it is detected from the Network. Its core function is to understand user movement (log in, logout), couting people in the room and detect if the social distance threshold is reached.
+If the threshold is reached the tracking module does two things:
+* Alerts admins about SocialDistance threshold reached, including picture of the room, asking for action.
+* Alerts each user connected to the rooms, asking for action.
+The Alert is done by sending certain alert type to the Bot, wich will in its turn transforme this alert in a Webex Team message rooms and send it accordingly.
+
+### Facial Mask Detection
+
+The Facil Mask Detection is responsible to analyze office images and detect people without Facial Mask.
+The Module runs whenever the Facility Manager/Admin ask to a particular Camera to do it. At the Bot, the admin informs Camera Name he/her need to detected faces. After that the Facil Mask Detection system starts, it runs periodic checks in the room, taking a picture and analyzing it for out of compliance events.  Whenever it founds it, it will alarm Admins about this. It will also sends event data to be stored for reporting.
+
 
 
 ## License
