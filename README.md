@@ -149,6 +149,8 @@ The Following resources will be needed before the installation:
 
 ### Project Setup
 
+### Main Variables
+
 Every module of this project shares a common configuration file "config_shared.py".
 You will need to populate the file with the following information:
 
@@ -158,6 +160,24 @@ You will need to populate the file with the following information:
 * Meraki Session: insert Meraki API Key Previously defined
 * Servers Session: No necessary to edit, used Local IP e ports to intercommunicate with modules.
 * BD Session: Edit User and Password created in the Influx DB system IF diferent from Default. Default is root.
+
+### Inventory
+
+The Socal Bot uses a piece of information to map Rooms according to Meraki devices used.
+This file inventory.py must be edited to include all Meraki devices user for the project.
+
+* Edit DB/inventory.py and include in Json format the followin information:
+   "SerialNumber": "XXXX-YYYY-ZZZZ",   // Serial Number of Meraki Device
+   "Device": "Camera", // Type of Device (Camera or Wifi)
+   "Nome": "Camera do Andrey", // A nome for the device - facility manager will refer to a device using this information
+   "Location": "RoomName", // Name for a room the device conver. This Name will be used as a match for the configuration of the Social Distance rules (Max People).
+   "NetworkID": "L_XXXX" // Network ID of the Meraki Device
+
+### Running the Project
+
+With the proper information, the Project is ready to start.
+
+* In the directory of the project, execute: sudo SocialDistance.sh to start all the modules.
 
 ## Documentation
 
