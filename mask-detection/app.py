@@ -20,8 +20,10 @@ def imagesAPI():
 def loopImages():
     if request.method == 'POST':
         network_id = request.values.get("network_id", type=str, default=None)
-        mv_serial = request.values.get("mv_serial", type=str, default=None)
+        mv_serial = request.values.get("mv_serial", type=str)
         turn = request.values.get("turn", type=str, default=None)
+        print (mv_serial)
+        print (network_id)
         statusfile = os.path.join(statuspath, mv_serial)
         if turn == "on":
             if path.exists(statusfile) is False:
@@ -29,7 +31,7 @@ def loopImages():
                 f.close()
                 thread = threading.Thread(target=loopVerification, args=(network_id, mv_serial, statusfile))
                 thread.start()
-                return("Verificação iniciada para a camera: " + str(mv_serial))
+                return("Analysis started to camera: " + str(mv_serial))
             else:
                 os.remove(statusfile)
                 time.sleep(2)
@@ -37,16 +39,16 @@ def loopImages():
                 f.close()
                 thread = threading.Thread(target=loopVerification, args=(network_id, mv_serial, statusfile))
                 thread.start()
-                return("Verificação já iniciada para esta camera. Reiniciamos o processo!")
+                return("This camera already has an ongoing analysis. Restarting the process!")
         if turn == "off":
             try:
                 os.remove(statusfile)
-                return("Verificação parada para a camera: " + str(mv_serial))
+                return("Analysis stopped to camera: " + str(mv_serial))
             except:
-                return ("Verificação não existente.")
+                return ("Analysis does not exist.")
         else:
-            return ("Por favor, envie a opção ""turn"" com o valor ""on""para habiltar a Verificação e ""off"" para desabilitar.")
+            return ("Please, send the option ""turn"" with the value ""one"" to enable or ""off"" to disable the analysis.")
     else:
-        return "You need to send a POST containing the required arguments (network_id, mv_serial and timestamp)"
+        return "You need to send a POST containing the required arguments (network_id, mv_serial and timestamp or turn on|off option)"
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=10000, debug=True, threaded=True)
+    app.run(host="159.89.238.176", port=10000, debug=True, threaded=True)

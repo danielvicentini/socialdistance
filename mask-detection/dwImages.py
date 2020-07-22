@@ -1,16 +1,11 @@
+
 import meraki, datetime, json, requests, os.path, shutil, time, threading, os, sys
-sys.path.append(os.path.abspath('..'))
-from config import *
-from config_shared import api_key
+from config_meraki import *
 from video import *
-from bdware import bd_update
 from os import path
 
-
-
-sys.path.append(os.path.abspath('../DB'))
-
-
+sys.path.append(os.path.abspath('..'))
+from config_shared import meraki_api_key
 
 #Local path to save Images
 rooting = os.path.abspath(os.getcwd()) + "/mask-detection"
@@ -18,7 +13,7 @@ save_path = rooting + "/static/images/downloaded/"
 imagesAnalized = "/static/images/images-analized/"
 save_checked = rooting + imagesAnalized
 save_checkedMasked = rooting + "/static/images/Masked/"
-publishUrl = "http://36e7827354fb.ngrok.io"
+publishUrl = "http://159.89.238.176:10000"
 publishPath = publishUrl + imagesAnalized
 
 #Function to format the Time
@@ -26,21 +21,17 @@ def frmtTime(timeStamp):
     for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S-%f"):
         if fmt in ("%Y-%m-%d %H:%M:%S.%f"):
             timeStamp = datetime.datetime.strptime(timeStamp, "%Y-%m-%d %H:%M:%S.%f")
-            timeStamp = datetime.datetime.strftime(timeStamp, "%Y-%m-%dT%H:%M:%S-03:00")
-            print("passei aqui")
-            print (timeStamp)
+            timeStamp = datetime.datetime.strftime(timeStamp, "%Y-%m-%dT%H:%M:%S-0300")
             return(timeStamp)
         elif fmt in ("%Y-%m-%dT%H:%M:%S-%f"):
             timeStamp = datetime.datetime.strptime(timeStamp, "%Y-%m-%dT%H:%M:%S-%f")
-            timeStamp = datetime.datetime.strftime(timeStamp, "%Y-%m-%dT%H:%M:%S-03:00")
-            print("passei aqui")
-            print (timeStamp)
+            timeStamp = datetime.datetime.strftime(timeStamp, "%Y-%m-%dT%H:%M:%S-0300")
             return(timeStamp)    
 
 def loopVerification(network_id, mv_serial, statusfile): 
     while path.exists(statusfile):
         eterno = getMerakiImage.main(network_id, mv_serial)
-        time.sleep(1) 
+        time.sleep(1)
 
 #Function to save the image file
 def saveFile(myFileName, snapShotUrl):
@@ -64,7 +55,7 @@ class  getMerakiImage:
         dbTimeStamp = timeStamp
         myTime = datetime.datetime.strptime(timeStamp, "%Y-%m-%dT%H:%M:%S%z")
         myTime = datetime.datetime.strftime(myTime, "%Y-%m-%d-%H-%M-%S")
-        dashboard = meraki.DashboardAPI(api_key=api_key ,suppress_logging=True)
+        dashboard = meraki.DashboardAPI(api_key=meraki_api_key,suppress_logging=True)
         my_orgs = dashboard.organizations.getOrganizations()
         try:
             mySnap = dashboard.cameras.generateNetworkCameraSnapshot(network_id, mv_serial, timestamp=timeStamp )
@@ -99,7 +90,7 @@ def notifyBot(checkImage):
 	"alarm": "distance-bot",
 	"data": {
 		"type": "01",
-		"message": "Pessoa sem mascara detectada.",
+		"message": "Person without mask detected.",
 		"who": notifyMV,
 		"image": myNoMaskImage
 	        }
@@ -118,8 +109,11 @@ def notifyBot(checkImage):
         "url":myNoMaskImage,
         "time": dbTimeStamp
         }
-    bd_update(payload)
-
+    payload = json.dumps(payload)
+   #print (payload)
+    dbAddress = "http://127.0.0.1:8000/api/v1/banco"
+    dbresponse = requests.request("POST", url=dbAddress, headers=headers, data=payload)
+    #print (dbresponse.content)
 
 if __name__ == '__main__':
     getIt = getMerakiImage.main()

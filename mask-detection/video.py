@@ -15,7 +15,6 @@ def tagVideo(modelpath=None, videopath=None, outputPath=None, outputPathMask=Non
     """
     model = MaskDetector()
     model.load_state_dict(torch.load(modelpath, map_location='cpu')['state_dict'], strict=False)
-    
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = model.to(device)
     model.eval()
@@ -30,10 +29,8 @@ def tagVideo(modelpath=None, videopath=None, outputPath=None, outputPathMask=Non
         Resize((100, 100)),
         ToTensor(),
     ])
-    
     if outputPath:
         writer = FFmpegWriter(str(outputPath))
-    
     font = cv2.FONT_HERSHEY_SIMPLEX
     #cv2.namedWindow('main', cv2.WINDOW_NORMAL)
     labels = ['No mask', 'Mask']
@@ -70,17 +67,16 @@ def tagVideo(modelpath=None, videopath=None, outputPath=None, outputPathMask=Non
                             font, 1, labelColor[predicted], 2)
             if outputPath:
                 try:
-                    print(labels[predicted])
                     if labels[predicted] == "No mask":
                         writer.writeFrame(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
                         writer.close()
                         os.remove(videopath)
-                        print ("Person with no mask detected!")
+                        print ("Person without mask detected!")
                         return("No mask")
                     elif labels[predicted] == "Mask":
                         os.remove(videopath)
                         print ("Person with mask detected!")
-                        return ("Faced detected with Mask")
+                        return ("Face detected with Mask")
                 except:
                     os.remove(videopath)
                     print ("No face detected!")
