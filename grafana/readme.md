@@ -19,6 +19,8 @@ We are using a standard installation of the Grafana Open Source or OSS. Dependin
 
 After it's installed, you should be able to access the Grafana GUI via the server ip address in the port 3000.
 
-Grafana has the concept of Dashboards and inside the Dashboards you create Panels. In our example we are using a single Dashboard with multiple panels.
+Grafana has the concept of Dashboards and inside the Dashboards you create Panels. In our example we are using a single Dashboard with multiple panels inside it.
 
-<img width=“964” alt=“java 8 and prio java 8  array review example” src=“https://github.com/jaimehernan95/arrayReview-java/blob/master/images/%20arrayExample.png 34”>
+Here in this directory you have a grafana_dashboard_example.json that can be imported to your setup and adjusted in case you have a different number of sensors (WiFi and Cameras).
+
+![Grafana Dashboard Example](grafana_dashboard_example.png)
