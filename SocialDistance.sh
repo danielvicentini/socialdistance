@@ -6,8 +6,9 @@ cd track_system
 nohup python3 pysyslog.py &
 nohup python3 syslog_parsing.py &
 nohup python3 trigger.py &
-cd mask-detection
+cd ..
 echo Mask Detection start
+cd mask-detection
 nohup python3 app.py &
 cd..
 echo Social Bot start 
