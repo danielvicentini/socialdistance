@@ -227,7 +227,7 @@ def showRunning():
     for b in administradores:
         msg=msg+f"{b}  \n"
 
-    msg=msg+f"Admins Webex room:{admins_room}  \n"
+    msg=msg+f"  \nAdmins Webex room:{admins_room}  \n"
 
     msg=msg+"\n***Room Distancing configuration:***  \n\n"
     try:
@@ -248,20 +248,23 @@ def reportDistancing(periodo):
 # funcao historico
 
     msg=""
-    msg=msg+"  \nO histórico é o seguinte:  \n"
-    #msg=msg+"Sala ***Cafeteria***: dentro do distanciamento.  \n"
-    #msg=msg+"Sala ***Reunião***: fora do distanciamento na parte da manhã. Estouro em 10 pessoas.  \n"
+    msg=msg+"  \nHistory of Maximum distance Out of Compliance:  \n\n"
 
     try:
         # Teste de código para consultar report
         url = f"http://{report_server}:{report_server_port}/api/v1/consulta/totalcount/{periodo}"
         headers = {'Content-Type': "application/json" }
         response = requests.request("GET", url, headers=headers)
-        msg=msg+response.text
+        
+        resposta=json.loads(response.text)
+        msg=msg+f"{resposta['msg']}  \n"
+
+        
+        #msg=msg+response.text
     except:
         msg="\nCan't connect to server.  \n"
 
-    return msg
+    return f"***{msg}***"
 
 def reportBestday(periodo):
 
@@ -269,43 +272,51 @@ def reportBestday(periodo):
     periodo=f"-{periodo}"
   
     msg=""
-    msg=msg+"  \nBest Day to go to the office:  \n"
+    msg=msg+"  \nBest Day to go to the office:  \n\n"
 
     try:
         # Teste de código para consultar report
         url = f"http://{report_server}:{report_server_port}/api/v1/consulta/bestday/{periodo}"
         headers = {'Content-Type': "application/json" }
         response = requests.request("GET", url, headers=headers)
-        msg=msg+response.text
+        
+        resposta=json.loads(response.text)
+        msg=msg+f"{resposta['msg']}  \n"
+
+        
+        #msg=msg+response.text
     except:
         msg="\nCan't connect to server.  \n"
 
-    return msg
+    return f"***{msg}***"
 
 
-def reportTracing (pessoa,periodo):
-
-    # adiciona sinal negativo
-    periodo=f"-{periodo}"
+def reportTracing (pessoa,start,end):
   
     # report of people tracing
+    
     msg=""
+    msg=msg+f"  \nTracing: {pessoa} for the period:{start} to {end} \n\n"
 
     # Teste de código para consultar report
     try:
-        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/{pessoa}&{periodo}"
+        url = f"http://{report_server}:{report_server_port}/api/v1/consulta/peoplelog/{pessoa}&{start}&{end}"
         headers = {'Content-Type': "application/json" }
         response = requests.request("GET", url, headers=headers)
-        msg=msg+response.text
+        resposta=json.loads(response.text)
+        msg=msg+f"{resposta['msg']}  \n"
+
+        #msg=msg+response.text
     except:
         msg="\nCan't connect to server.  \n"
 
-    return msg
+    return f"***{msg}***"
         
 def reportMask(timeframe):
 
     # Mask Detection
-    msg="Report of people not wearing mask:  \n"
+    msg=""
+    msg=msg+"  \nReport of people not wearing mask:  \n\n"
                             
     try: 
         # Chama report server API
@@ -313,11 +324,11 @@ def reportMask(timeframe):
         headers = {'Content-Type': "application/json" }
         response = requests.request("GET", url, headers=headers)
         resposta=json.loads(response.text)
-        msg=msg+f"***{resposta['msg']}***  \n"
+        msg=msg+f"{resposta['msg']}  \n"
     except:
         msg="\nCan't connect to server.  \n"
 
-    return msg
+    return f"***{msg}***"
 
 def cameraStart(camera):
 
@@ -582,14 +593,14 @@ def logica(comando,usermail):
                     # Tracing
                     # terminar... ainda não está pedindo todos os parametros
                     pessoa=lista_parametros[0]
-                    periodo=lista_parametros[1]
-                    func=reportTracing(pessoa,periodo)
+                    start=lista_parametros[1]
+                    end=lista_parametros[2]
+                    func=reportTracing(pessoa,start,end)
                     msg=msg+func
                                        
                 elif codigo==53:
                     # Best Day
                     periodo=lista_parametros[0]
-                    msg=msg+f"Best days to go to office:  \n"
                     func=reportBestday(periodo)
                     msg=msg+func
 

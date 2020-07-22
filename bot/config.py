@@ -40,6 +40,7 @@ memoria={}
 #---------------------------------------------------
 
 def le_config():
+    configuracao=dict()
     try:
         with open('config.json',encoding='utf-8') as json_file:
             configuracao=json.load(json_file)  
