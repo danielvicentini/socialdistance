@@ -36,12 +36,12 @@ The social distance project deploys InfluxDB to store its time series.
 
 ### PeopleTrace Measurement
 
-**Measuremnt** = TotalTrace
+**Measuremnt** = PeopleTrace
 | Name        | tag/field | Description                       | Type | Values              |
 | ----------- |:---------:| ------------------ | ------------ | ------------ |
 | time | --- | Time associated to the measurement | epoch time |
 | local | tag | Location where the person was detected | string | from inventory.py  |
-| origin | tag | Origin of the measurement | string | wifi | 
+| origin | field | Origin of the measurement | string | wifi | 
 | state | field | Indicates if the events is associate to the person going into or out of the place | string | entrou, saiu | 
 | userid | field | ID of the person thaht was detected |
 
@@ -49,7 +49,7 @@ The social distance project deploys InfluxDB to store its time series.
 
 ### Mask Detection Measurement
 
-**Measurement** = MVAndrey
+**Measurement** = MaskEvents
 
 | Name        | tag/field | Description                       | Type | Values              |
 | ----------- |:---------:| ------------------ | ------------ | ------------ |
