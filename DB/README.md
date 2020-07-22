@@ -1,9 +1,11 @@
 # Social Distance Project DATABASE  
 
+This project relies in a INFLUXDB database for storing all the collected data.  
+
 ## Directory Content  
 **DB.py:** Python module that handles DB write and query.  It assumes that a database has already been created and is available as specified by values in DBconst.py.  
 
-**DBconst.py:** Defines all alias to be used in DB.py.  For instance: name of the database, location of the database, name of the measurements.  The proposal is that all "strings" are constant values are defined here, making it easier to change them and avoiding misconfiguration.  
+
 
 **DBtest.py** Module to exemplify and test the use of DB.py.  
 
@@ -24,15 +26,30 @@ The social distance project deploys InfluxDB to store its time series.
 ## Measurements  
 ### PeopleCount Measurement  
 
-**Measurement** = RawPeopleCount  
+**Measurement** = TotalCount  
 | Name        | tag/field | Description                       | Type | Values              |
 | ----------- |:---------:| ------------------ | ------------ | ------------ |
-| location | tag | Location associated to this count | string | TBD  |
+| location | tag | Location associated to this count | string | from inventory.py  |
 | origin | tag | Origin of the measurement | string | camera, wifi, ??? | 
 | count | field | Number of peple detected at this moment at this location | integer |  |
 
 
-**PLEASE DOCUMENT OTHER MEASUREMENTS AS THEY ARE CREATED**  
+### PeopleTrace Measurement
+
+**Measuremnt** = TotalTrace
+
+### Mask Detecttion Measurement
+
+**Measurement** = MVAndrey
+
+| Name        | tag/field | Description                       | Type | Values              |
+| ----------- |:---------:| ------------------ | ------------ | ------------ |
+| time | --- | Time associated to the measurement | epoch time |
+| detected | field | Number of people without mask in a certain location
+| local | tag | Location associated to this count | string | from inventory.py  |
+| network | tag | Network of meraki camera used in the detection | |
+| serial | tag | Serial number of meraki camera used in the detection | |
+| url | field | URL where image assocaited to the event were stored | |
 
 </br>
 </br> 
