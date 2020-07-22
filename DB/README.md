@@ -3,11 +3,11 @@
 This project relies in a INFLUXDB database for storing all the collected data.  
 
 ## Directory Content  
-**DB.py:** Python module that handles DB write and query.  It assumes that a database has already been created and is available as specified by values in DBconst.py.  
+**DB.py:** Python module that handles DB write and query.  It assumes that a database has already been created and is available as specified by values in ../config_shared.py.  
 
+**bdware.py:** Define class DBCLient which instantiate a handler for the SocialDistance InfluxDB database.  When a object is instantitated, connection to the database is opened. A DBClient object can be used to write data in INFLUXD database, so thaht user doesn't need to know details about the measurement.  Some simple query are also implemented in this module.
 
-
-**DBtest.py** Module to exemplify and test the use of DB.py.  
+**bdFluxQueries.py:** Implements more complex queries, based on FLUX language, which is used to generate reports. 
 
 </br>
 </br> 
@@ -17,7 +17,7 @@ This project relies in a INFLUXDB database for storing all the collected data.
 The social distance project deploys InfluxDB to store its time series.  
 
 **DB name:** socialdistance  
-**Host:** localhost  (actual host to be defined)  
+**Host:** As indicated in ../config_shared.py  
 **Port:** 8086  
 
 </br>
@@ -30,42 +30,39 @@ The social distance project deploys InfluxDB to store its time series.
 | Name        | tag/field | Description                       | Type | Values              |
 | ----------- |:---------:| ------------------ | ------------ | ------------ |
 | location | tag | Location associated to this count | string | from inventory.py  |
-| origin | tag | Origin of the measurement | string | camera, wifi, ??? | 
+| origin | tag | Origin of the measurement | string | camera, wifi | 
 | count | field | Number of peple detected at this moment at this location | integer |  |
 
 
 ### PeopleTrace Measurement
 
 **Measuremnt** = TotalTrace
+| Name        | tag/field | Description                       | Type | Values              |
+| ----------- |:---------:| ------------------ | ------------ | ------------ |
+| time | --- | Time associated to the measurement | epoch time |
+| local | tag | Location where the person was detected | string | from inventory.py  |
+| origin | tag | Origin of the measurement | string | wifi | 
+| state | field | Indicates if the events is associate to the person going into or out of the place | string | entrou, saiu | 
+| userid | field | ID of the person thaht was detected |
 
-### Mask Detecttion Measurement
+</br>
+
+### Mask Detection Measurement
 
 **Measurement** = MVAndrey
 
 | Name        | tag/field | Description                       | Type | Values              |
 | ----------- |:---------:| ------------------ | ------------ | ------------ |
 | time | --- | Time associated to the measurement | epoch time |
-| detected | field | Number of people without mask in a certain location
+| detected | field | Number of people without mask in a certain location | integer | |
 | local | tag | Location associated to this count | string | from inventory.py  |
-| network | tag | Network of meraki camera used in the detection | |
-| serial | tag | Serial number of meraki camera used in the detection | |
-| url | field | URL where image assocaited to the event were stored | |
+| network | tag | Network of meraki camera used in the detection | string | |
+| serial | tag | Serial number of meraki camera used in the detection | string | |
+| url | field | URL where image assocaited to the event were stored | string | |
 
 </br>
 </br> 
 
-## Testing Environment
-
-While the actual Database to be used is not available, pelase install a local copy of InfluxDB to allow testing.
-
-1. Download InfluxDB as described here: https://docs.influxdata.com/influxdb/v1.8/introduction/download/
-2. Install InfluxDB as specified here: https://docs.influxdata.com/influxdb/v1.8/introduction/install/
-3. Make sure that Influxd is running
-4. Enter in Influx console via the following command:  *influx -precision rfc3339*
-5. Create the database from the console: *> CREATE DATABASE socialdistance*
-
-</br>
-</br> 
 
 ## InfluxDB tutorial  
 
