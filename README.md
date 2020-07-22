@@ -99,7 +99,12 @@ Firts, look for bot name at the Webex Teams "People" list. After finding it, sta
 
 ## Installation
 
-How to install or setup the project for use.
+### Pre-requisites
+
+The Following resources will be needed before the installation:
+* For Webex Teams bot will be necessary to create the bot identity. Please check how to create a bot at http://develeper.webex.com if necessary.
+* The following 4 Webex Teams pieces of information are necessary: bot email, bot token, bot tag, and bot public URL address - This URL should be the public address where this application will be hosted. Any public Internet Source service that hosts aplications and provide public Web access should work.
+* A Meraki API-key. The application connects with Meraki Dashboard and Meraki MV API. The API-Key can be generate in the Settings Dashboard at http://dashboard.meraki.com
 
 
 ## Documentation
