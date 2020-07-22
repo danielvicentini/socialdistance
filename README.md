@@ -20,12 +20,13 @@ There will be three kind of modules:
 
 Webex Teams will be leveraged as the frontend.    
 
-Regarding monitoring modules, the following is being considered: 
+Regarding monitoring modules, the following is implemented: 
  -Detection of people not using facial mask, leveraging video analytic build over Meraki cameras. 
- -Identification and counting of people in a certain site leveraging Meraki cameras native analytics, Meraki WiFi location APIs and others. 
+ -Identification and counting of people in a certain site leveraging Meraki cameras native analytics, Meraki WiFi location APIs and others.
+ -Tracing people with whom an infected person had contact within the work environment during the period when he was supposed to have had the virus incubated.  
+ 
  -Detecting the minimum distance between people in a site (stretch goal), levering video analytiac build over Meraki cameras.  
 
-As a stretch goal, we plan to build a backend module for determining the people with whom an infected person had contact within the work environment during the period when he was supposed to have had the virus incubated.  
 
 ### Cisco Products Technologies/ Services
 Our solution will levegerage the following Cisco technologies
@@ -41,6 +42,17 @@ Our solution will levegerage the following Cisco technologies
 
 
 ## Solution Components
+
+Infrastructure Components:
+* Linux Server to host applications
+* Python applications to exchange information at the Backend, Monitoring Modules and Front End modules
+* Influx DB for data storage
+* A cloud IaaS service to host all the components - In our project we host it on Digital Ocean Service.
+* Cisco Webex Teams Cloud Services as a Fronted for the users
+* Cisco Meraki Cloud Services to interact with the necessary information
+
+Cisco Hardware:
+* Meraki MV and MR devices to generate Data
 
 
 <!-- This does not need to be completed during the initial submission phase  
