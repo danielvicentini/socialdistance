@@ -6,7 +6,7 @@ PACKAGE_PARENT = '..'
 SCRIPT_DIR = os.path.dirname(os.path.realpath(os.path.join(os.getcwd(), os.path.expanduser(__file__))))
 sys.path.append(os.path.normpath(os.path.join(SCRIPT_DIR, PACKAGE_PARENT)))
 
-from influxdb_client import InfluxDBClient, Point
+from influxdb_client import InfluxDBClient as IF, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
 from config_shared import INFLUXDB_HOST, INFLUXDB_PORT, INFLUXDB_DBUSER, INFLUXDB_DBPASSWORD, INFLUXDB_DBNAME, INFLUXDB_USER, INFLUXDB_PASSWORD
 from config_shared import TABELA_MV, TABELA_TOTAL, TABELA_TRACE
@@ -18,8 +18,6 @@ import pandas as pd
 ###### Mudando a tabela de Trace para TraceDaniel porque a atual tabela de trace
 ###### nao tem nenhum dado.  O mesmo foi feito para a tabela de count.
 ################################################################################
-TABELA_TRACE = "TraceDaniel"
-TABELA_TOTAL = "RawPeopleCount"
 
 
 QUERY_TRACE = \
@@ -139,7 +137,7 @@ def TraceReport(targetUser, startTime, stopTime):
 
   # Connects to the database
   url = "http://{}:{}".format(INFLUXDB_HOST, INFLUXDB_PORT)     
-  client = InfluxDBClient(url=url, token="", org="")
+  client = IF(url=url, token="", org="")
 
   # Build trace query
   query = QUERY_TRACE % (targetUser, startTime, stopTime, TABELA_TRACE)
@@ -195,7 +193,7 @@ def OccupancyReport(LocationInventory, startTime):
 
   # Connects to the database
   url = "http://{}:{}".format(INFLUXDB_HOST, INFLUXDB_PORT)     
-  client = InfluxDBClient(url=url, token="", org="")
+  client = IF(url=url, token="", org="")
 
   # Preapre to create a table with maximum occupancy per room 
   TABELA_LOCATION = "LocationInventory"
@@ -254,7 +252,7 @@ def BestDayReport(startTime):
 
   # Connects to the database
   url = "http://{}:{}".format(INFLUXDB_HOST, INFLUXDB_PORT)     
-  client = InfluxDBClient(url=url, token="", org="")
+  client = IF(url=url, token="", org="")
 
   # Build trace query
   query = QUERY_BEST_DAY % (startTime, TABELA_TOTAL)
