@@ -167,11 +167,12 @@ The Socal Bot uses a piece of information to map Rooms according to Meraki devic
 This file inventory.py must be edited to include all Meraki devices user for the project.
 
 * Edit DB/inventory.py and include in Json format the followin information:
-   "SerialNumber": "XXXX-YYYY-ZZZZ",   // Serial Number of Meraki Device
-   "Device": "Camera", // Type of Device (Camera or Wifi)
-   "Nome": "Camera do Andrey", // A nome for the device - facility manager will refer to a device using this information
-   "Location": "RoomName", // Name for a room the device conver. This Name will be used as a match for the configuration of the Social Distance rules (Max People).
-   "NetworkID": "L_XXXX" // Network ID of the Meraki Device
+* "SerialNumber": "XXXX-YYYY-ZZZZ",   // Serial Number of Meraki Device
+* "Device": "Camera", // Type of Device (Camera or Wifi)
+* "Nome": "Camera do Andrey", // A nome for the device - facility manager will refer to a device using this information
+* "Location": "RoomName", // Name for a room the device conver. This Name will be used as a match for the configuration of the Social Distance rules (Max People).
+* "NetworkID": "L_XXXX" // Network ID of the Meraki Device
+* Repeat the proccess to each Device that will be used
 
 ### Running the Project
 
