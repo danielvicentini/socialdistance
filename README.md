@@ -146,6 +146,19 @@ The Following resources will be needed before the installation:
 * Setup Meraki Cameras: Cameras->Settings->Sense->MQTT Broker->Add MQTT Broker.
 * Use the following parameters: Eclipse Broker, Mqtt.eclipse.org, Port: 1883, Security None. Apply
 
+
+### Project Setup
+
+Every module of this project shares a common configuration file "config_shared.py".
+You will need to populate the file with the following information:
+
+* Admin Session: define the list of admins/facility managers <name@domain.com>. If there are many, use commas.
+* Admin Room: the Webex Teams Admins rooms name previously defined.
+* Webex Bot Session: insert Bot details (WebHooK URL Address, Bot Token, Bot Email and Bot Tag) previously defined.
+* Meraki Session: insert Meraki API Key Previously defined
+* Servers Session: No necessary to edit, used Local IP e ports to intercommunicate with modules.
+* BD Session: Edit User and Password created in the Influx DB system IF diferent from Default. Default is root.
+
 ## Documentation
 
 Pointer to reference documentation for this project.
