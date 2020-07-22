@@ -123,7 +123,9 @@ The Following resources will be needed before the installation:
 
 ### Grafana Dashboard Server
 
-* PENDENTE
+* Import JSON view from grafana folder: grafana_dashboard_example.json
+* Edit Devices and Rooms names according to the used inventory.
+* Details of Grafana view in the grafana Folder.
 
 ### Python
 
