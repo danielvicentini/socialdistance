@@ -36,9 +36,6 @@ mask_server_port=10000
 # Webex Teams Bot Address
 bot_server=public_ip
 bot_server_port=7000
-# Track API address
-tt_server=public_ip
-tt_server_port=9000
 # Grafana Dashboard Address
 grafana_server=public_ip
 grafana_server_port=3000
