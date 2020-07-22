@@ -85,6 +85,7 @@ Firts, look for bot name at the Webex Teams "People" list. After finding it, sta
 ### Commands available for All users
 
 * Help:  Will provided the known commands for the users depending of his/her role (regular or admin)
+* Report Best Days to go to office: this option will tell user what is the best days to go to a room at the office. Users will provide a past day information where bot will use to generate a data block to compute days of week with lowest Occupancy. Example - past 15 days.
 
 ### Commands available for Admin Users
 
@@ -92,7 +93,9 @@ Firts, look for bot name at the Webex Teams "People" list. After finding it, sta
 * Start/Stop Camera (for mask detection): define wich Meraki Cameras will be used to take snapshots and analyze if there's people in the room without Masks. Bot will ask for Camera name.
 * Show Running Configuration: this option will show 1) the current configuration wich is the Admin users id; 2) The "Admins Room' name used for the bot to inform admin alerts and 3) the configured rooms with Room Name and Max people quantity defined.
 * Show Inventory: this option will show the actual Meraki Devices been used for the system to gather information and interact for Mask Detection in the case of MV Cameras.
-
+* Report historic of Distancing: this option will information by rooms and dates the shifts that Occupancy of rooms where beyond Social Distance Rules, reaching out of compliance. Bot will ask user to provied a past time information to provide the report - example past 15 days.
+* Report Mask Detection: thil option will report how many People with no-mask events were detected in the past days. Bot will ask user to provied a past time information to provide the report - example past 15 days.
+* Report Tracing: this option will report a list of people that were at the office and rooms with a suspect of contagion in a certain period. Bot will ask userid of suspect and a time frame to investigate the list of users. Example: userid, startdate, end date.
 
 ## Installation
 
