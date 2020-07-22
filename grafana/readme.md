@@ -21,4 +21,4 @@ After it's installed, you should be able to access the Grafana GUI via the serve
 
 Grafana has the concept of Dashboards and inside the Dashboards you create Panels. In our example we are using a single Dashboard with multiple panels.
 
-<a href="https://github.com/danielvicentini/socialdistance/blob/master/grafana/grafana_dashboard_example.png> Grafana Dashboard</a>
+<img width=“964” alt=“java 8 and prio java 8  array review example” src=“https://github.com/jaimehernan95/arrayReview-java/blob/master/images/%20arrayExample.png 34”>
