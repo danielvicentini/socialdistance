@@ -133,7 +133,7 @@ The Following resources will be needed before the installation:
 ### Python
 
 * Go the project directory
-* Install necessary libs with the command: pip3 install -r requirements.txt
+* Install necessary libs with the command: *pip3 install -r requirements.txt*
 
 ### Webex Teams
 
