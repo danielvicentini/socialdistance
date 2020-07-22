@@ -185,12 +185,21 @@ With the proper information, the Project is ready to start.
 
 * In the directory of the project, execute: sudo SocialDistance.sh to start all the modules.
 
+### Using for the first time
+
+Whenever Meraki network starts to send login / logout information, the project will receive this information and will be storing at the Data Base.
+
+It is necessary to define at least 1 room and maximum quantity of people in that room. This information will be needed for the reporting functions of the Project and also to generate alerts to admins and users. Use the "config rooms" command with the Social Bot.
+
+It is necessary to activate at least 1 camera for Facial Mask Detection to start analyzing it and recording. Use the "start camera" for that.
+
+
+
 ## How the Project Works
 
 The SocialDistance project consists of 4 independent modules that shares information with each other via an API Rest-based model. Each folder of this project has more detail of each piece of code for each module.
 
 ### Modules Documentation
-
 
 ### Social Bot
 
