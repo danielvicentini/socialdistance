@@ -3,5 +3,6 @@ pprint==0.1
 requests==2.22.0
 bottle==0.12.18
 bottle-rest==0.5.2
+webexteamssdk==1.2
 
 
