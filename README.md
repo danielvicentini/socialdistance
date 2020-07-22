@@ -1,6 +1,6 @@
 # Social Distance
 
-This is the social distance project description
+This is the social distance project description. [Solution Video](https://youtu.be/t7SyvDfP8dM)
 
 
 ## Business/Technical Challenge
