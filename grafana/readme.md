@@ -23,7 +23,7 @@ Grafana has the concept of Dashboards and inside the Dashboards you create Panel
 
 ![Grafana Dashboard Example](grafana_dashboard_example.png)
 
-Here in this directory we have a JSON file (grafana_dashboard_example.json) that can be imported (Left menu "+" -> import) to your setup that will create the main dashboard with some panels. When you first load it, you need to edit each panel and define your room names to get the graphics plot going. You do this editing the influx query in each panel as in this example.
+Here in this directory we have a JSON file (grafana_dashboard_example.json) that can be imported (Left menu "+" -> import) to your setup that will create the main dashboard with some panels. When you first load it, you need to edit each panel and define your room names to get the graphics plot going. You do this editing the influx query in each panel as in this example, changing the location from Sala to your Room's name.
 
 ![Editing Grafana Panel Query](grafana_panel_query_edit.png)
 
