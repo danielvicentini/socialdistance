@@ -241,7 +241,7 @@ The Facil Mask Detection is responsible to analyze office images and detect peop
 At the Bot, the Admin informs Camera Name he/her need to detected faces. After that the Facial Mask Detection system starts, it runs periodic checks in the room, taking a picture and analyzing it for out of compliance events.  Whenever it founds it, it will alarm Admins about this. It will also sends event data to be stored for reporting.
 
 
-## Suport
+## Support
 
 ### Checking if the modules are running
 
