@@ -21,6 +21,10 @@ After it's installed, you should be able to access the Grafana GUI via the serve
 
 Grafana has the concept of Dashboards and inside the Dashboards you create Panels. In our example we are using a single Dashboard with multiple panels inside it.
 
-Here in this directory you have a grafana_dashboard_example.json that can be imported to your setup and adjusted in case you have a different number of sensors (WiFi and Cameras).
-
 ![Grafana Dashboard Example](grafana_dashboard_example.png)
+
+Here in this directory we have a JSON file (grafana_dashboard_example.json) that can be imported (Left menu "+" -> import) to your setup that will create the main dashboard with some panels. When you first load it, you need to edit each panel and define your room names to get the graphics plot going. You do this editing the influx query in each panel as in this example.
+
+![Editing Grafana Panel Query](grafana_panel_query_edit.png)
+
+
