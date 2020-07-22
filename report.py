@@ -7,7 +7,6 @@ import sys
 import os
 sys.path.append(os.path.abspath('DB'))
 
-
 import json
 from bottle import route, run, request, post, get, static_file
 from bdware import bd_update, bd_consulta
