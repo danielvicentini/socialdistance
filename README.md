@@ -70,17 +70,28 @@ Cisco Hardware:
 
 ## Front End Interaction
 
+Users must have a proper Webex Teams account created and the Webex Teams client (Desktop or Mobile) installed.
+
 Theres are two types of users known by the Frontend system: the regular employess wich are Webex Teams users and the Admin users that are the Facility Managers/People responsible for the Social Distance compliance at the offices. The Admin users are also Cisco Webex Teams users.
 
 The Webex Teams users (both admin or regular users) will interact with the Bot which it will understand certain configured commands. When a user chat with the bot, it will automaticaly understand if a user is or isn't a admin users. After that it will provide users with the available commands for them.
 
 The Bot will try to understand what user is typing and provide the closest know option it knows.
 
+### Initiating Chat with the bot
+
+Firts, look for bot name at the Webex Teams "People" list. After finding it, starts a 1:1 chat room.
+
 ### Commands available for All users
 
-* Help:  Will provided the known commands for the users depending of his role (regular or admin)
+* Help:  Will provided the known commands for the users depending of his/her role (regular or admin)
 
-# Commands available for Admin Users
+### Commands available for Admin Users
+
+* Configure Room Distancing: define the maximum allowed quantity of people in a certain Room. The maximum information will serve as the threshold for alerts after this condition is reached. The maximum information will impact reporting around out of compliance Social Distancing. Bot will ask room name and max qty of people in that room.
+* Start/Stop Camera (for mask detection): define wich Meraki Cameras will be used to take snapshots and analyze if there's people in the room without Masks. Bot will ask for Camera name.
+* Show Running Configuration: this option will show 1) the current configuration wich is the Admin users id; 2) The "Admins Room' name used for the bot to inform admin alerts and 3) the configured rooms with Room Name and Max people quantity defined.
+* Show Inventory: this option will show the actual Meraki Devices been used for the system to gather information and interact for Mask Detection in the case of MV Cameras.
 
 
 ## Installation
