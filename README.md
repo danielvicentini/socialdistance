@@ -105,6 +105,7 @@ The Following resources will be needed before the installation:
 * For Webex Teams bot will be necessary to create the bot identity. Please check how to create a bot at http://develeper.webex.com if necessary.
 * The following 4 Webex Teams pieces of information are necessary: bot email, bot token, bot tag, and bot public URL address - This URL should be the public address where this application will be hosted. Any public Internet Source service that hosts aplications and provide public Web access should work.
 * A Meraki API-key. The application connects with Meraki Dashboard and Meraki MV API. The API-Key can be generate in the Settings Dashboard at http://dashboard.meraki.com
+* The Meraki Organization ID and Network ID to find and connect to Meraki Devices.
 
 ## Instalation
 
@@ -159,9 +160,9 @@ You will need to populate the file with the following information:
 * Admin Session: define the list of admins/facility managers <name@domain.com>. If there are many, use commas.
 * Admin Room: the Webex Teams Admins rooms name previously defined.
 * Webex Bot Session: insert Bot details (WebHooK URL Address, Bot Token, Bot Email and Bot Tag) previously defined.
-* Meraki Session: insert Meraki API Key Previously defined
-* Servers Session: No necessary to edit, used Local IP e ports to intercommunicate with modules.
-* BD Session: Edit User and Password created in the Influx DB system IF diferent from Default. Default is root.
+* Meraki Session: insert Meraki API Key, ORG ID and Net ID previously defined.
+* Servers Session: Edit Public IP Address, that will be shared across all modules.
+* BD Session: Edit root User/Password and DB user/password createded in the Influx DB system.
 
 ### Inventory
 
