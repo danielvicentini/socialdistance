@@ -84,7 +84,7 @@ Firts, look for bot name at the Webex Teams "People" list. After finding it, sta
 
 ### Commands available for All users
 
-* ****Help****:  Will provided the known commands for the users depending of his/her role (regular or admin)
+* ****Help***:  Will provided the known commands for the users depending of his/her role (regular or admin)
 * ***Report Best Days to go to office***: this option will tell user what is the best days to go to a room at the office. Users will provide a past day information where bot will use to generate a data block to compute days of week with lowest Occupancy. Example - past 15 days.
 
 ### Commands available for Admin Users
@@ -174,7 +174,7 @@ This file inventory.py must be edited to include all Meraki devices user for the
 * Edit DB/inventory.py and include in Json format the followin information:
 * "SerialNumber": "XXXX-YYYY-ZZZZ",   // Serial Number of Meraki Device
 * "Device": "Camera", // Type of Device (Camera or Wifi)
-* "Nome": "Camera do Andrey", // A nome for the device - facility manager will refer to a device using this information
+* "Nome": "Camera Name", // A nome for the device - facility manager will refer to a device using this information
 * "Location": "RoomName", // Name for a room the device conver. This Name will be used as a match for the configuration of the Social Distance rules (Max People).
 * "NetworkID": "L_XXXX" // Network ID of the Meraki Device
 * Repeat the proccess to each Device that will be used
@@ -183,15 +183,15 @@ This file inventory.py must be edited to include all Meraki devices user for the
 
 With the proper information, the Project is ready to start.
 
-* In the directory of the project, execute: *sudo SocialDistance.sh* to start all the modules.
+* In the directory of the project, execute: "*sh SocialDistance.sh*" to start all the modules.
 
 ### Using for the first time
 
 Whenever Meraki network starts to send login / logout information, the project will receive this information and will be storing at the Data Base.
 
-It is necessary to define at least 1 room and maximum quantity of people in that room. This information will be needed for the reporting functions of the Project and also to generate alerts to admins and users. Use the "config rooms" command with the Social Bot.
+It is necessary to define at least one room and maximum quantity of people in that room. This information will be needed for the reporting functions of the Project and also to generate alerts to admins and users. Use the "*config rooms*" command with the Social Bot.
 
-It is necessary to activate at least 1 camera for Facial Mask Detection to start analyzing it and recording. Use the "start camera" for that.
+It is necessary to activate at least one camera for Facial Mask Detection to start analyzing it and recording. Use the "start camera" for that.
 
 It is necessary enough data for a proper report quality. We suggest at least one week of data.
 
