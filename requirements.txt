@@ -62,7 +62,7 @@ Werkzeug==1.0.1
 yarl==1.4.2
 requests==2.21.0
 webexteamssdk==1.1.1
-python-3.7.2bottle_rest==0.5.2
+bottle_rest==0.5.2
 meraki==0.110.5
 requests==2.18.4
 bottle==0.12.18
