@@ -84,7 +84,7 @@ Firts, look for bot name at the Webex Teams "People" list. After finding it, sta
 
 ### Commands available for All users
 
-* ****Help***:  Will provided the known commands for the users depending of his/her role (regular or admin)
+* ***Help***:  Will provided the known commands for the users depending of his/her role (regular or admin)
 * ***Report Best Days to go to office***: this option will tell user what is the best days to go to a room at the office. Users will provide a past day information where bot will use to generate a data block to compute days of week with lowest Occupancy. Example - past 15 days.
 
 ### Commands available for Admin Users
@@ -276,11 +276,11 @@ Process of each module after start:
 * Is the config_shared.py variables correct? (most common problem)
 * Is there any Firewall service blocking MQTT/Syslog from the Internet?
 
-**-Reports at the bot replys 'Can't connect to the server'**
+**-Reports at the bot replies 'Can't connect to the server'**
 * Is influxDB running?
 * Is InfluxDB user/password correctly configure?
 
-**-Reports at the bot replys 'No data'**
+**-Reports at the bot replies 'No data'**
 * Are there enough data?
 
 
