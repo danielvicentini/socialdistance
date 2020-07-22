@@ -12,8 +12,13 @@ This is an initial dashboard using Influx native queries, but more complex queri
 
 ## Grafana Instalation
 
+We are using a standard installation of the Grafana Open Source or OSS. Depending of the operational system that you are using, follow the documentation to install it: https://grafana.com/docs/grafana/latest/installation/
 
 
 ## Grafana Configuration
 
+After it's installed, you should be able to access the Grafana GUI via the server ip address in the port 3000.
 
+Grafana has the concept of Dashboards and inside the Dashboards you create Panels. In our example we are using a single Dashboard with multiple panels.
+
+<a href="https://github.com/danielvicentini/socialdistance/blob/master/grafana/grafana_dashboard_example.png> Grafana Dashboard</a>
