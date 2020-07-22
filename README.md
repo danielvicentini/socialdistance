@@ -70,13 +70,13 @@ Cisco Hardware:
 
 ## Front End Interaction
 
-Theres is two types of users known by the Frontend system: the regular employess wich are Webex Teams users and the Admin users that are the Facility Managers/People responsible for the Social Distance compliance at the offices. The Admin users are also Cisco Webex Teams users.
+Theres are two types of users known by the Frontend system: the regular employess wich are Webex Teams users and the Admin users that are the Facility Managers/People responsible for the Social Distance compliance at the offices. The Admin users are also Cisco Webex Teams users.
 
 The Webex Teams users (both admin or regular users) will interact with the Bot which it will understand certain configured commands. When a user chat with the bot, it will automaticaly understand if a user is or isn't a admin users. After that it will provide users with the available commands for them.
 
 The Bot will try to understand what user is typing and provide the closest know option it knows.
 
-# Commands available for All users
+### Commands available for All users
 
 * Help:  Will provided the known commands for the users depending of his role (regular or admin)
 
