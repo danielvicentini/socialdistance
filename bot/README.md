@@ -26,4 +26,4 @@ Treats POST from other modules to deliver messages to the users.
 
 ## construct.py
 
-CLI code tool to generate user options.json file. The options are the commands that logic mode will load to present and understand commands available to the user, as well as the code identifier in order for logic module to execute appropiate functions.
+CLI code tool to generate user options.json file. This options are the available commands that logic mode will load to present to the user, as well as the code identifier used for logic module to execute functions.
