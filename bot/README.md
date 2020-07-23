@@ -4,7 +4,7 @@
 
 ## Socialbot.py
 
-This module is the main module. It iniates bot integration with Webex Teams calls Webserver functions and keep waiting for Webex Webhooks.
+This module is the main module. It iniates bot integration with Webex Teams, calls Webserver functions and keep waiting for Webex Webhooks.
 Whenever a Webhook arrives, bot calls logica.py module to analyse user commands.
 
 ## Webexteams.py
