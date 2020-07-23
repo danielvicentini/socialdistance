@@ -1,4 +1,0 @@
-<134>1 1593012339.691518296 Z1 events type=association radio='1' vap='1' client_mac='40:83:1D:3C:34:BB' client_ip='10.0.20.5' channel='44' rssi='40' identity='maralves@cisco.com' aid='455956081'
-<134>1 1593012339.774860909 Z1 events type=8021x_deauth radio='1' vap='1' client_mac='40:83:1D:3C:34:BB' client_ip='10.0.20.5' identity='maralves@cisco.com' aid='455956081'
-<134>1 1593012342.654383746 Z1 events type=8021x_eap_success radio='1' vap='1' client_mac='40:83:1D:3C:34:BB' client_ip='10.0.20.5' identity='maralves@cisco.com' aid='455956081'
-<134>1 1593012342.680126821 Z1 events type=8021x_auth radio='1' vap='1' client_mac='40:83:1D:3C:34:BB' client_ip='10.0.20.5' identity='maralves@cisco.com' aid='455956081'
