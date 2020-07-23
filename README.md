@@ -59,7 +59,7 @@ Infrastructure Components:
 * Python applications to exchange information at the Backend, Monitoring Modules and Front End modules
 * Influx DB for data storage
 * Grafana Server for Dashboard GUI
-* A cloud IaaS service to host all the components - In our project we host it on Digital Ocean Service.
+* A Cloud IaaS service to host all the components - In our project we host it on Digital Ocean Service.
 * Cisco Webex Teams Cloud Services as a Frontend for the users
 * Cisco Meraki Cloud Services to interact with the necessary information
 
@@ -138,7 +138,7 @@ The Following resources will be needed before the installation:
 ### Webex Teams
 
 * Define a Webex Teams Room Name for the Admins/Facility Managers
-* Include the Bot name in the room
+* Include the social bot name in the room
 * Include the admins users in the room
 * Have the admins users list, it will be used for the project setup.
 
@@ -191,7 +191,7 @@ Whenever Meraki network starts to send login / logout information, the project w
 
 It is necessary to define at least one room and maximum quantity of people in that room. This information will be needed for the reporting functions of the Project and also to generate alerts to admins and users. Use the "*config rooms*" command with the Social Bot.
 
-It is necessary to activate at least one camera for Facial Mask Detection to start analyzing it and recording. Use the "*start camera*" for that.
+Activate at least one camera for Facial Mask Detection to start analyzing it and recording. Use the "*start camera*" for that.
 
 It is necessary enough data for a proper report quality. We suggest at least one week of data.
 
