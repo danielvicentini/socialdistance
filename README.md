@@ -270,15 +270,15 @@ Process of each module after start:
 
 **-No Data being generated**
 * Is Meraki Networking send syslog data to the application?
-* Is MV sending MQTT data to the application
+* Is MV sending MQTT data to the application?
 * Is influxDB running?
-* Is InfluxDB user/password correctly configure?
+* Is InfluxDB user/password correctly configured?
 * Is the config_shared.py variables correct? (most common problem)
 * Is there any Firewall service blocking MQTT/Syslog from the Internet?
 
 **-Reports at the bot replies 'Can't connect to the server'**
 * Is influxDB running?
-* Is InfluxDB user/password correctly configure?
+* Is InfluxDB user/password correctly configured?
 
 **-Reports at the bot replies 'No data'**
 * Are there enough data?
