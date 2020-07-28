@@ -220,7 +220,7 @@ It receives data and stores it in the Influx DataBase using tables.
 * The Count table records the summing of people in the office.
 * The MaskDetection table records whenever the Camera detects people without Mask in the office.
 
-Busides recording, the Data Storage Module produces reporting of the consolidated data. It can report:
+Besides recording, the Data Storage Module produces reporting of the consolidated data. It can report:
 * Historic of Occupancy,
 * Best Days to go to the office, 
 * Tracing of people and,
