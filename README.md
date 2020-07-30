@@ -169,7 +169,7 @@ You will need to populate the file with the following information:
 ### Inventory
 
 The Socal Bot uses a piece of information to map Rooms according to Meraki devices used.
-This file inventory.py must be edited to include all Meraki devices user for the project.
+The file *inventory.py* must be edited to include all Meraki devices user for the project.
 
 * Edit DB/inventory.py and include in Json format the followin information:
 * "SerialNumber": "XXXX-YYYY-ZZZZ" *Serial Number of Meraki Device
@@ -233,7 +233,7 @@ If the threshold is reached the tracking module does two things:
 * Alerts admins about SocialDistance threshold reached, including picture of the room, asking for action.
 * Alerts each user connected to the rooms, asking for action.
 
-The Alert is done by sending certain alert type to the bot, wich will in its turn transforme this alert in a Webex Team message rooms and send it accordingly.
+The Alert is done by sending certain alert type to the bot, wich will in its turn transform this alert in a Webex Teams message and send it to the room accordingly.
 
 ### Facial Mask Detection
 
