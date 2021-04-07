@@ -65,5 +65,5 @@ webexteamssdk==1.1.1
 bottle_rest==0.5.2
 meraki==0.110.5
 requests==2.18.4
-bottle==0.12.18
+bottle==0.12.19
 DB==0.1.1
