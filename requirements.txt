@@ -31,7 +31,7 @@ MarkupSafe==1.1.1
 meraki==0.110.4
 msgpack==0.6.1
 multidict==4.7.6
-numpy==1.19.0
+numpy==1.22.0
 oauthlib==3.1.0
 opencv-python==4.2.0.34
 pandas==1.0.5
