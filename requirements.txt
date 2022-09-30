@@ -25,7 +25,7 @@ idna==2.10
 influxdb==5.3.0
 itsdangerous==1.1.0
 Jinja2==2.11.2
-joblib==0.16.0
+joblib==1.2.0
 Markdown==3.2.2
 MarkupSafe==1.1.1
 meraki==0.110.4
